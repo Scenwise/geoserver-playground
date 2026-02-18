@@ -1,77 +1,110 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import mapboxgl, { LngLatLike } from 'mapbox-gl';
 
-import 'mapbox-gl/dist/mapbox-gl.css';
+import 'ol/ol.css';
+import { Map, View } from 'ol';
+import TileLayer from 'ol/layer/Tile';
+import { TileWMS } from 'ol/source';
+import apply, { MapboxVectorLayer } from 'ol-mapbox-style';
+import { useTheme } from 'next-themes';
+import LayerGroup from 'ol/layer/Group';
+import { State } from 'ol/View';
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 interface MapboxMapProps {
-  center: LngLatLike;
-  onUpdateCenter?: (center: LngLatLike) => void;
+  view?: Partial<State>;
+  onUpdateView?: (view: State) => void;
 }
 
-export function MapboxMap({ center, onUpdateCenter }: MapboxMapProps) {
-  const mapRef = useRef<mapboxgl.Map>(null);
+export function MapboxMap({ view, onUpdateView }: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<Map>(null);
 
+  const { theme } = useTheme();
+
+  // Initialize the map on component mount
   useEffect(() => {
-    mapboxgl.accessToken = accessToken;
+    if (!mapContainerRef.current) return;
 
-    mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current!,
-      center: center,
-      zoom: 12,
-      config: { basemap: { theme: 'monochrome' } },
+    const map = new Map({
+      target: mapContainerRef.current!,
+      layers: [
+        new MapboxVectorLayer({
+          styleUrl: mapStyle(theme),
+          accessToken,
+        }),
+        new TileLayer({
+          source: new TileWMS({
+            url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
+            params: { LAYERS: 'scenwise:skeleton_graph_edges', TILED: true },
+            serverType: 'geoserver',
+          }),
+        }),
+        new TileLayer({
+          source: new TileWMS({
+            url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
+            params: { LAYERS: 'scenwise:skeleton_graph_nodes', TILED: true },
+            serverType: 'geoserver',
+          }),
+        }),
+      ],
+      view: new View({
+        projection: 'EPSG:3857',
+        ...view,
+      }),
     });
 
-    mapRef.current?.on('load', () => {
-      console.log('Map loaded');
+    mapRef.current = map;
 
-      mapRef.current!.addSource('wms-test-source', {
-        type: 'raster',
-        // use the tiles option to specify a WMS tile source URL
-        // https://docs.mapbox.comhttps://docs.mapbox.com/style-spec/reference/sources/
-        tiles: [
-          // 'https://geoserver.scenwise.nl/geoserver/scenwise/wms?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.3.0&request=GetMap&srs=EPSG:3857&transparent=true&width=256&height=256&layers=scenwise:skeleton_graph_nodes',
-          'https://geoserver.scenwise.nl/geoserver/scenwise/wms?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&FORMAT=image/png&STYLES=&TRANSPARENT=TRUE&LAYERS=scenwise:skeleton_graph_nodes&TILED=true&WIDTH=256&HEIGHT=256&CRS=EPSG:4258&BBOX={bbox-epsg-3857}',
-        ],
-        tileSize: 256,
-      });
-
-      mapRef.current!.addLayer({
-        id: 'wms-test-layer',
-        type: 'raster',
-        source: 'wms-test-source',
-        paint: {},
-        slot: 'middle',
-      });
+    // Update center on map move
+    map.on('moveend', () => {
+      const view = map.getView();
+      onUpdateView?.(view.getState());
     });
 
-    // Listen for map movement and update the center state
-    mapRef.current.on('moveend', () => {
-      const newCenter = mapRef.current!.getCenter();
-      onUpdateCenter?.([newCenter.lng, newCenter.lat]);
-    });
-
-    return () => {
-      mapRef.current!.remove();
-    };
+    return () => map.setTarget(undefined);
   }, []);
 
-  // Update map center when the `center` prop changes
+  // Update the map view state
   useEffect(() => {
-    const currentCenter = mapRef.current?.getCenter();
-    if (
-      mapRef.current &&
-      (!currentCenter ||
-        currentCenter.lng !== center[0] ||
-        currentCenter.lat !== center[1])
-    ) {
-      mapRef.current.flyTo({ center });
+    if (!mapRef.current || !view) return;
+
+    const mapView = mapRef.current.getView();
+    const currentZoom = mapView.getZoom();
+    const currentCenter = mapView.getCenter();
+
+    const targetZoom = view.zoom !== currentZoom ? view.zoom : undefined;
+    const targetCenter =
+      view.center && view.center.length === 2 ? view.center : undefined;
+
+    if (targetZoom || targetCenter) {
+      mapView.animate({
+        zoom: targetZoom,
+        center: targetCenter,
+        duration: 100,
+      });
     }
-  }, [center]);
+  }, [view]);
+
+  // Change the base layer to trigger a style update when the theme changes
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const layers = mapRef.current.getLayers();
+    layers.removeAt(0);
+
+    const layerGroup = new LayerGroup();
+    apply(layerGroup, mapStyle(theme), { accessToken });
+
+    layers.insertAt(0, layerGroup);
+  }, [theme]);
 
   return <div className="w-full h-full" ref={mapContainerRef} />;
 }
+
+const mapStyle = (theme?: string) =>
+  theme === 'dark'
+    ? 'mapbox://styles/mapbox/dark-v11'
+    : 'mapbox://styles/mapbox/light-v11';
