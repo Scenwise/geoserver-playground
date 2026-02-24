@@ -1,6 +1,8 @@
 import { MapContainer } from '@/components/map-container';
 import { MapboxMap } from '@/components/mapbox-map';
+import { Badge } from '@/components/ui/badge';
 import { MAP_CONFIG } from '@/data/maps';
+import { GitCommitIcon, SplineIcon } from 'lucide-react';
 
 export default async function MapPage({
   params,
@@ -21,15 +23,23 @@ export default async function MapPage({
   const nodes = await nodeData.json();
 
   return (
-    <div className="min-h-svh flex flex-col px-4 pt-12 pb-4 space-y-12">
+    <div className="min-h-svh flex flex-col px-4 pt-12 pb-4 space-y-6">
       <header className="space-y-2">
         <h1 className="scroll-m-24 text-3xl font-semibold tracking-tight sm:text-3xl">
           {map?.name}
         </h1>
 
-        <p className="text-muted-foreground text-[1.05rem] sm:text-base sm:text-balance md:max-w-[80%]">
-          {edges?.totalFeatures} edges, {nodes?.totalFeatures} nodes
-        </p>
+        <div className="flex gap-2">
+          <Badge variant="secondary">
+            <GitCommitIcon />
+            {nodes?.totalFeatures} nodes
+          </Badge>
+
+          <Badge variant="secondary">
+            <SplineIcon />
+            {edges?.totalFeatures} edges
+          </Badge>
+        </div>
       </header>
 
       <MapContainer className="grow">

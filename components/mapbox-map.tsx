@@ -33,7 +33,7 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
       },
   );
 
-  const { styleUrl, setIsSatellite } = useMapStyle(mapRef);
+  const { styleUrl, isSatellite, setIsSatellite } = useMapStyle(mapRef);
 
   // Initialize the map on component mount
   useEffect(() => {
@@ -117,7 +117,7 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
 
       <ButtonGroup
         orientation="vertical"
-        className="self-start place-self-end mt-3 mr-3 ring-2 ring-background rounded-lg shadow"
+        className="self-start place-self-end mt-3 mr-3 ring-2 ring-background bg-background rounded-lg shadow"
       >
         <Button onClick={() => zoom(1)} variant="outline" size="icon">
           <Plus />
@@ -131,6 +131,7 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
         type="single"
         variant="outline"
         className="bg-background self-end place-self-end z-10 mb-3 mr-3 ring-2 ring-background shadow"
+        value={isSatellite ? 'satellite' : 'default'}
       >
         <ToggleGroupItem value="default" onClick={() => setIsSatellite(false)}>
           <PaletteIcon />

@@ -39,5 +39,5 @@ export function useMapStyle(mapRef: React.RefObject<Map | null>) {
     layers.insertAt(0, layerGroup);
   }, [styleUrl]);
 
-  return { styleUrl, setIsSatellite };
+  return { styleUrl, isSatellite, setIsSatellite };
 }

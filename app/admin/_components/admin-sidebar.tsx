@@ -1,3 +1,4 @@
+import ScenwiseLogo from '@/components/scenwise-logo';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -66,8 +67,9 @@ export default function AdminSidebar() {
     <Sidebar variant="inset">
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <span className="text-base px-2">
+          <SidebarMenuItem className="flex gap-2 items-center px-2 text-base">
+            <ScenwiseLogo />
+            <span>
               <span className="font-semibold">SmartNavigator</span> Admin
             </span>
           </SidebarMenuItem>
