@@ -6,10 +6,13 @@ import 'ol/ol.css';
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import { TileWMS } from 'ol/source';
-import apply, { MapboxVectorLayer } from 'ol-mapbox-style';
-import { useTheme } from 'next-themes';
-import LayerGroup from 'ol/layer/Group';
+import { MapboxVectorLayer } from 'ol-mapbox-style';
 import { State } from 'ol/View';
+import { useMapStyle } from '@/hooks/use-map-style';
+import { Button } from './ui/button';
+import { Minus, PaletteIcon, Plus, SatelliteIcon } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
+import { ButtonGroup } from './ui/button-group';
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
@@ -22,8 +25,6 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map>(null);
 
-  const { theme } = useTheme();
-
   const [view] = useState<Partial<State>>(
     () =>
       initialView || {
@@ -31,6 +32,8 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
         zoom: 17,
       },
   );
+
+  const { styleUrl, setIsSatellite } = useMapStyle(mapRef);
 
   // Initialize the map on component mount
   useEffect(() => {
@@ -40,7 +43,7 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
       target: mapContainerRef.current!,
       layers: [
         new MapboxVectorLayer({
-          styleUrl: mapStyle(theme),
+          styleUrl,
           accessToken,
         }),
         new TileLayer({
@@ -62,6 +65,7 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
         projection: 'EPSG:3857',
         ...view,
       }),
+      controls: [],
     });
 
     mapRef.current = map;
@@ -85,7 +89,11 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
 
     const targetZoom = view.zoom !== currentZoom ? view.zoom : undefined;
     const targetCenter =
-      view.center && view.center.length === 2 ? view.center : undefined;
+      view.center &&
+      (view.center[0] !== currentCenter?.[0] ||
+        view.center[1] !== currentCenter?.[1])
+        ? view.center
+        : undefined;
 
     if (targetZoom || targetCenter) {
       mapView.animate({
@@ -96,23 +104,43 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
     }
   }, [view]);
 
-  // Change the base layer to trigger a style update when the theme changes
-  useEffect(() => {
+  function zoom(value: number) {
     if (!mapRef.current) return;
 
-    const layers = mapRef.current.getLayers();
-    layers.removeAt(0);
+    const view = mapRef.current.getView();
+    view.animate({ zoom: view.getZoom()! + value, duration: 100 });
+  }
 
-    const layerGroup = new LayerGroup();
-    apply(layerGroup, mapStyle(theme), { accessToken });
+  return (
+    <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10">
+      <div className="w-full h-full" ref={mapContainerRef} />
 
-    layers.insertAt(0, layerGroup);
-  }, [theme]);
+      <ButtonGroup
+        orientation="vertical"
+        className="self-start place-self-end mt-3 mr-3 ring-2 ring-background rounded-lg shadow"
+      >
+        <Button onClick={() => zoom(1)} variant="outline" size="icon">
+          <Plus />
+        </Button>
+        <Button onClick={() => zoom(-1)} variant="outline" size="icon">
+          <Minus />
+        </Button>
+      </ButtonGroup>
 
-  return <div className="w-full h-full" ref={mapContainerRef} />;
+      <ToggleGroup
+        type="single"
+        variant="outline"
+        className="bg-background self-end place-self-end z-10 mb-3 mr-3 ring-2 ring-background shadow"
+      >
+        <ToggleGroupItem value="default" onClick={() => setIsSatellite(false)}>
+          <PaletteIcon />
+          Basic
+        </ToggleGroupItem>
+        <ToggleGroupItem value="satellite" onClick={() => setIsSatellite(true)}>
+          <SatelliteIcon />
+          Satellite
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </div>
+  );
 }
-
-const mapStyle = (theme?: string) =>
-  theme === 'dark'
-    ? 'mapbox://styles/mapbox/dark-v11'
-    : 'mapbox://styles/mapbox/light-v11';
