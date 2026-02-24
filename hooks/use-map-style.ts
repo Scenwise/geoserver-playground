@@ -16,15 +16,15 @@ const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
  * @returns setIsSatellite - A function to toggle satellite mode on or off.
  */
 export function useMapStyle(mapRef: React.RefObject<Map | null>) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [isSatellite, setIsSatellite] = useState(false);
 
   const styleUrl = useMemo(() => {
     if (isSatellite) return 'mapbox://styles/mapbox/satellite-v9';
-    return theme === 'dark'
+    return resolvedTheme === 'dark'
       ? 'mapbox://styles/mapbox/dark-v11'
       : 'mapbox://styles/mapbox/light-v11';
-  }, [theme, isSatellite]);
+  }, [resolvedTheme, isSatellite]);
 
   // Change the base layer to trigger a style update when the theme changes
   useEffect(() => {
