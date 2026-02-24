@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 import 'ol/ol.css';
 import { Map, View } from 'ol';
@@ -14,15 +14,23 @@ import { State } from 'ol/View';
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 interface MapboxMapProps {
-  view?: Partial<State>;
+  initialView?: Partial<State>;
   onUpdateView?: (view: State) => void;
 }
 
-export function MapboxMap({ view, onUpdateView }: MapboxMapProps) {
+export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map>(null);
 
   const { theme } = useTheme();
+
+  const [view] = useState<Partial<State>>(
+    () =>
+      initialView || {
+        center: [497598, 6785131],
+        zoom: 17,
+      },
+  );
 
   // Initialize the map on component mount
   useEffect(() => {

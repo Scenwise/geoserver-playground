@@ -1,0 +1,130 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui/sidebar';
+import { MAP_CONFIG } from '@/data/maps';
+import { ArrowLeft, ChevronsLeftRight, Gauge, Map, View } from 'lucide-react';
+import Link from 'next/link';
+
+type AdminSidebarItem = {
+  title: string;
+  icon: React.ComponentType;
+  badge?: string;
+  href?: string;
+};
+
+type AdminSidebarGroup = {
+  label?: string;
+  items: AdminSidebarItem[];
+};
+
+export default function AdminSidebar() {
+  const tools: AdminSidebarItem[] = [
+    {
+      title: 'Compare',
+      icon: ChevronsLeftRight,
+      href: '/admin/compare',
+    },
+    {
+      title: 'Street View',
+      icon: View,
+      badge: 'Soon',
+    },
+  ];
+
+  const maps: AdminSidebarItem[] = MAP_CONFIG.map((map) => ({
+    title: map.name,
+    icon: Map,
+    href: `/admin/maps/${map.id}`,
+  }));
+
+  const items: AdminSidebarGroup[] = [
+    {
+      items: [
+        {
+          title: 'Dashboard',
+          icon: Gauge,
+          href: '/admin',
+        } satisfies AdminSidebarItem,
+      ],
+    },
+    { label: 'Maps', items: maps },
+    { label: 'Tools', items: tools },
+  ];
+
+  return (
+    <Sidebar variant="inset">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <span className="text-base px-2">
+              <span className="font-semibold">SmartNavigator</span> Admin
+            </span>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
+      <SidebarContent>
+        {items.map((group, index) => (
+          <SidebarGroup key={index}>
+            {group.label && (
+              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            )}
+
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      asChild
+                      disabled={!item.href}
+                    >
+                      <Link
+                        href={item.href ?? '#'}
+                        className="flex items-center gap-2"
+                      >
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                        {item.badge && (
+                          <Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 ml-auto">
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Button color="primary" size="sm" asChild>
+                <Link href="/">
+                  <ArrowLeft />
+                  Main application
+                </Link>
+              </Button>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}

@@ -1,9 +1,5 @@
 'use client';
 
-import { LngLatLike } from 'mapbox-gl';
-
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { ModeToggle } from '@/components/mode-toggle';
 import { MapboxMap } from '@/components/mapbox-map';
 import {
   Item,
@@ -22,19 +18,15 @@ export default function Home() {
   });
 
   return (
-    <main className="min-h-svh flex px-4 pt-4 items-stretch">
-      <aside className="w-1/4 h-full rounded-xl">
-        <ModeToggle />
-      </aside>
-
+    <div className="min-h-svh flex p-4 items-stretch">
       <Item className="flex-col grow gap-2 items-stretch pb-0">
         <ItemContent className="basis-0 grow-0">
           <ItemTitle>Map v1.1</ItemTitle>
           <ItemDescription>Based on first version algorithm.</ItemDescription>
         </ItemContent>
 
-        <ItemFooter className="rounded-t-xl basis-0 grow overflow-hidden shadow-xl bg-card ring-4 ring-white dark:ring-white/10">
-          <MapboxMap view={view} onUpdateView={setView} />
+        <ItemFooter className="rounded-xl basis-0 grow overflow-hidden shadow-xl bg-card ring-4 ring-white dark:ring-white/10">
+          <MapboxMap initialView={view} onUpdateView={setView} />
         </ItemFooter>
       </Item>
 
@@ -44,10 +36,10 @@ export default function Home() {
           <ItemDescription>Based on first version algorithm.</ItemDescription>
         </ItemContent>
 
-        <ItemFooter className="rounded-t-xl basis-0 grow overflow-hidden shadow-lg bg-card ring-4 ring-white dark:ring-white/10">
-          <MapboxMap view={view} onUpdateView={setView} />
+        <ItemFooter className="rounded-xl basis-0 grow overflow-hidden shadow-lg bg-card ring-4 ring-white dark:ring-white/10">
+          <MapboxMap initialView={view} onUpdateView={setView} />
         </ItemFooter>
       </Item>
-    </main>
+    </div>
   );
 }
