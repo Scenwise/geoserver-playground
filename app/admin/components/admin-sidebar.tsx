@@ -6,6 +6,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
@@ -13,9 +14,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { MAP_CONFIG } from '@/data/maps';
+import { db } from '@/lib/db';
+import { geoserverMaps } from '@/lib/db/schema';
 import { ArrowLeft, ChevronsLeftRight, Gauge, Map, View } from 'lucide-react';
 import Link from 'next/link';
+import { GeoserverMapForm } from './goeserver-map-form';
 
 type AdminSidebarItem = {
   title: string;
@@ -26,10 +29,11 @@ type AdminSidebarItem = {
 
 type AdminSidebarGroup = {
   label?: string;
+  action?: React.ReactNode;
   items: AdminSidebarItem[];
 };
 
-export default function AdminSidebar() {
+export default async function AdminSidebar() {
   const tools: AdminSidebarItem[] = [
     {
       title: 'Compare',
@@ -43,7 +47,12 @@ export default function AdminSidebar() {
     },
   ];
 
-  const maps: AdminSidebarItem[] = MAP_CONFIG.map((map) => ({
+  const dbMaps = await db
+    .select()
+    .from(geoserverMaps)
+    .orderBy(geoserverMaps.name);
+
+  const maps: AdminSidebarItem[] = dbMaps.map((map) => ({
     title: map.name,
     icon: Map,
     href: `/admin/maps/${map.id}`,
@@ -59,7 +68,7 @@ export default function AdminSidebar() {
         } satisfies AdminSidebarItem,
       ],
     },
-    { label: 'Maps', items: maps },
+    { label: 'Maps', items: maps, action: <GeoserverMapForm /> },
     { label: 'Tools', items: tools },
   ];
 
@@ -81,6 +90,9 @@ export default function AdminSidebar() {
           <SidebarGroup key={index}>
             {group.label && (
               <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            )}
+            {group.action && (
+              <SidebarGroupAction asChild>{group.action}</SidebarGroupAction>
             )}
 
             <SidebarGroupContent>

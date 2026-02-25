@@ -1,0 +1,95 @@
+{
+  "id": "4dc9a694-d837-4db6-a0c0-7b491e5079a5",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.geoserver_maps": {
+      "name": "geoserver_maps",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "geoserver_maps_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geoserverEdges": {
+          "name": "geoserverEdges",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geoserverNodes": {
+          "name": "geoserverNodes",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "geoserver_maps_name_unique": {
+          "name": "geoserver_maps_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        },
+        "geoserver_maps_geoserverEdges_unique": {
+          "name": "geoserver_maps_geoserverEdges_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "geoserverEdges"
+          ]
+        },
+        "geoserver_maps_geoserverNodes_unique": {
+          "name": "geoserver_maps_geoserverNodes_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "geoserverNodes"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

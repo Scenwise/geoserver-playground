@@ -1,5 +1,5 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
-import AdminSidebar from './_components/admin-sidebar';
+import AdminSidebar from './components/admin-sidebar';
 import React from 'react';
 
 export default function AdminLayout({
