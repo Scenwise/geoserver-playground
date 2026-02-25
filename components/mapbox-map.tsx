@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 
 import 'ol/ol.css';
 import { Map, View } from 'ol';
+import { type MapOptions } from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
 import { TileWMS } from 'ol/source';
 import { MapboxVectorLayer } from 'ol-mapbox-style';
@@ -19,9 +20,16 @@ const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 interface MapboxMapProps {
   initialView?: Partial<State>;
   onUpdateView?: (view: State) => void;
+  edgeLayerId?: string;
+  nodeLayerId?: string;
 }
 
-export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
+export function MapboxMap({
+  initialView,
+  onUpdateView,
+  edgeLayerId,
+  nodeLayerId,
+}: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map>(null);
 
@@ -46,21 +54,23 @@ export function MapboxMap({ initialView, onUpdateView }: MapboxMapProps) {
           styleUrl,
           accessToken,
         }),
-        new TileLayer({
-          source: new TileWMS({
-            url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
-            params: { LAYERS: 'scenwise:skeleton_graph_edges', TILED: true },
-            serverType: 'geoserver',
+        edgeLayerId &&
+          new TileLayer({
+            source: new TileWMS({
+              url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
+              params: { layers: edgeLayerId, tiled: true },
+              serverType: 'geoserver',
+            }),
           }),
-        }),
-        new TileLayer({
-          source: new TileWMS({
-            url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
-            params: { LAYERS: 'scenwise:skeleton_graph_nodes', TILED: true },
-            serverType: 'geoserver',
+        nodeLayerId &&
+          new TileLayer({
+            source: new TileWMS({
+              url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
+              params: { layers: nodeLayerId, tiled: true },
+              serverType: 'geoserver',
+            }),
           }),
-        }),
-      ],
+      ].filter(Boolean) as MapOptions['layers'],
       view: new View({
         projection: 'EPSG:3857',
         ...view,

@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm';
 import { GitCommitIcon, SplineIcon } from 'lucide-react';
 import { GeoserverMapForm } from '../../components/goeserver-map-form';
 import { geoserverMaps } from '@/lib/db/schema';
+import { FeatureCountBadge } from '../../components/feature-count-badge';
 
 export default async function MapPage({
   params,
@@ -14,29 +15,10 @@ export default async function MapPage({
 }) {
   const { id } = await params;
 
-  console.log('Fetching data for map with id:', id);
-
   const [map] = await db
     .select()
     .from(geoserverMaps)
     .where(eq(geoserverMaps.id, Number(id)));
-
-  const edgeData = await fetch(
-    `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${map?.geoserverEdges}&outputFormat=application%2Fjson&maxFeatures=0`,
-  );
-
-  const nodeData = await fetch(
-    `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${map?.geoserverNodes}&outputFormat=application%2Fjson&maxFeatures=0`,
-  );
-
-  let edges = {};
-  let nodes = {};
-  try {
-    edges = await edgeData.json();
-    nodes = await nodeData.json();
-  } catch (error) {
-    console.error('Failed to parse edge or node data:', error);
-  }
 
   return (
     <div className="min-h-svh flex flex-col px-4 pt-12 pb-4 space-y-6">
@@ -46,16 +28,9 @@ export default async function MapPage({
             {map?.name}
           </h1>
 
-          <div className="flex gap-2">
-            <Badge variant="secondary">
-              <GitCommitIcon />
-              {nodes?.totalFeatures} nodes ({map.geoserverNodes})
-            </Badge>
-
-            <Badge variant="secondary">
-              <SplineIcon />
-              {edges?.totalFeatures} edges ({map.geoserverEdges})
-            </Badge>
+          <div className="flex flex-wrap gap-2">
+            <FeatureCountBadge id={map?.geoserverNodes || ''} type="nodes" />
+            <FeatureCountBadge id={map?.geoserverEdges || ''} type="edges" />
           </div>
         </div>
 
@@ -63,7 +38,10 @@ export default async function MapPage({
       </header>
 
       <MapContainer className="grow">
-        <MapboxMap />
+        <MapboxMap
+          edgeLayerId={map.geoserverEdges}
+          nodeLayerId={map.geoserverNodes}
+        />
       </MapContainer>
     </div>
   );
