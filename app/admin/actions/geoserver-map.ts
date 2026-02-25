@@ -27,3 +27,16 @@ export async function updateGeoServerMap(
   await db.update(geoserverMaps).set(data).where(eq(geoserverMaps.id, id));
   refresh();
 }
+
+export async function setGeoServerMapMain(id: number) {
+  await db
+    .update(geoserverMaps)
+    .set({ isMain: null })
+    .where(eq(geoserverMaps.isMain, true));
+  await db
+    .update(geoserverMaps)
+    .set({ isMain: true })
+    .where(eq(geoserverMaps.id, id));
+
+  refresh();
+}

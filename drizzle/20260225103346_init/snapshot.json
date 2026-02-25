@@ -1,0 +1,134 @@
+{
+  "id": "4dc9a694-d837-4db6-a0c0-7b491e5079a5",
+  "prevIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "version": "8",
+  "dialect": "postgres",
+  "ddl": [
+    {
+      "isRlsEnabled": false,
+      "name": "geoserver_maps",
+      "schema": "public",
+      "entityType": "tables"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "geoserver_maps_pkey",
+      "schema": "public",
+      "table": "geoserver_maps",
+      "entityType": "pks"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": {
+        "name": "geoserver_maps_id_seq",
+        "type": "always",
+        "startWith": "1",
+        "minValue": "1",
+        "maxValue": "2147483647",
+        "increment": "1",
+        "cache": 1,
+        "cycle": false
+      },
+      "name": "id",
+      "schema": "public",
+      "table": "geoserver_maps",
+      "entityType": "columns"
+    },
+    {
+      "type": "varchar(255)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "schema": "public",
+      "table": "geoserver_maps",
+      "entityType": "columns"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "version",
+      "schema": "public",
+      "table": "geoserver_maps",
+      "entityType": "columns"
+    },
+    {
+      "type": "varchar(255)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "geoserverEdges",
+      "schema": "public",
+      "table": "geoserver_maps",
+      "entityType": "columns"
+    },
+    {
+      "type": "varchar(255)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "geoserverNodes",
+      "schema": "public",
+      "table": "geoserver_maps",
+      "entityType": "columns"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "name"
+      ],
+      "nullsNotDistinct": false,
+      "name": "geoserver_maps_name_unique",
+      "schema": "public",
+      "table": "geoserver_maps",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "geoserverEdges"
+      ],
+      "nullsNotDistinct": false,
+      "name": "geoserver_maps_geoserverEdges_unique",
+      "schema": "public",
+      "table": "geoserver_maps",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "geoserverNodes"
+      ],
+      "nullsNotDistinct": false,
+      "name": "geoserver_maps_geoserverNodes_unique",
+      "schema": "public",
+      "table": "geoserver_maps",
+      "entityType": "uniques"
+    }
+  ],
+  "renames": []
+}

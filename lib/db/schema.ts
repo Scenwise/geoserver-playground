@@ -1,4 +1,4 @@
-import { integer, pgTable, varchar } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, varchar } from 'drizzle-orm/pg-core';
 
 export const geoserverMaps = pgTable('geoserver_maps', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -6,4 +6,6 @@ export const geoserverMaps = pgTable('geoserver_maps', {
   version: integer().notNull(),
   geoserverEdges: varchar({ length: 255 }).notNull().unique(),
   geoserverNodes: varchar({ length: 255 }).notNull().unique(),
+  isMain: boolean().unique(),
+  description: varchar({ length: 255 }),
 });

@@ -16,14 +16,21 @@ import {
 } from '@/components/ui/sidebar';
 import { db } from '@/lib/db';
 import { geoserverMaps } from '@/lib/db/schema';
-import { ArrowLeft, ChevronsLeftRight, Gauge, Map, View } from 'lucide-react';
+import {
+  ArrowLeft,
+  ChevronsLeftRight,
+  Gauge,
+  Map,
+  StarIcon,
+  View,
+} from 'lucide-react';
 import Link from 'next/link';
 import { GeoserverMapForm } from './goeserver-map-form';
 
 type AdminSidebarItem = {
   title: string;
   icon: React.ComponentType;
-  badge?: string;
+  badge?: { icon?: React.ComponentType; label: string };
   href?: string;
 };
 
@@ -43,7 +50,7 @@ export default async function AdminSidebar() {
     {
       title: 'Street View',
       icon: View,
-      badge: 'Soon',
+      badge: { label: 'Soon' },
     },
   ];
 
@@ -56,6 +63,7 @@ export default async function AdminSidebar() {
     title: map.name,
     icon: Map,
     href: `/admin/maps/${map.id}`,
+    badge: map.isMain ? { icon: StarIcon, label: 'Main' } : undefined,
   }));
 
   const items: AdminSidebarGroup[] = [
@@ -112,7 +120,10 @@ export default async function AdminSidebar() {
                         <span>{item.title}</span>
                         {item.badge && (
                           <Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 ml-auto">
-                            {item.badge}
+                            {item.badge.icon && (
+                              <item.badge.icon className="w-3 h-3 mr-1" />
+                            )}
+                            {item.badge.label}
                           </Badge>
                         )}
                       </Link>

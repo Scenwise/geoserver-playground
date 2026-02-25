@@ -25,18 +25,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import { Spinner } from '@/components/ui/spinner';
 import { useState } from 'react';
+import { Textarea } from '@/components/ui/textarea';
 
 interface GeoserverMapFormProps {
   data?: UpsertGeoserverMap;
+  children?: React.ReactNode;
 }
 
 export function GeoserverMapForm({
   data = {
     name: '',
-    version: 0,
+    version: '' as unknown as number,
+    description: '',
     geoserverEdges: '',
     geoserverNodes: '',
   },
+  children,
 }: GeoserverMapFormProps) {
   const label = 'id' in data && data.id ? 'Edit' : 'Add';
 
@@ -65,7 +69,7 @@ export function GeoserverMapForm({
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <form>
         <AlertDialogTrigger asChild>
-          <Button variant="default">{label}</Button>
+          {children || <Button variant="default">{label}</Button>}
         </AlertDialogTrigger>
         <AlertDialogContent className="sm:max-w-sm">
           <AlertDialogHeader>
@@ -112,12 +116,29 @@ export function GeoserverMapForm({
             />
 
             <Controller
+              name="description"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="geoserver-map-form-description">
+                    Description
+                  </FieldLabel>
+                  <Textarea
+                    {...field}
+                    id="geoserver-map-form-description"
+                    aria-invalid={fieldState.invalid}
+                  />
+                </Field>
+              )}
+            />
+
+            <Controller
               name="geoserverEdges"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={!!fieldState.invalid}>
                   <FieldLabel htmlFor="geoserver-map-form-edges">
-                    Geoserver Edges
+                    Geoserver edges
                   </FieldLabel>
                   <Input
                     id="geoserver-map-form-edges"
@@ -134,7 +155,7 @@ export function GeoserverMapForm({
               render={({ field, fieldState }) => (
                 <Field data-invalid={!!fieldState.invalid}>
                   <FieldLabel htmlFor="geoserver-map-form-nodes">
-                    Geoserver Nodes
+                    Geoserver nodes
                   </FieldLabel>
                   <Input
                     id="geoserver-map-form-nodes"

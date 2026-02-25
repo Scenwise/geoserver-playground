@@ -1,4 +1,11 @@
 import { Badge } from '@/components/ui/badge';
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from '@/components/ui/item';
 import { safeJson } from '@/lib/safe-json';
 import { GitCommitIcon, SplineIcon, TriangleAlertIcon } from 'lucide-react';
 
@@ -22,16 +29,24 @@ export async function FeatureCountBadge({
   const isSuccess = response.ok && !error;
 
   return (
-    <Badge variant={isSuccess ? 'secondary' : 'destructive'}>
-      {isSuccess ? <BadgeIcon /> : <TriangleAlertIcon />}
-      {isSuccess ? `${json?.totalFeatures} ${type}` : `Could not load ${type}`}
-      <span
-        className={`text-2xs ${
-          isSuccess ? 'text-muted-foreground' : 'text-destructive/80'
-        }`}
-      >
-        {id}
-      </span>
-    </Badge>
+    <Item variant="outline">
+      <ItemMedia variant="icon">
+        <BadgeIcon />
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle className="capitalize">{type}</ItemTitle>
+        <ItemDescription>{id}</ItemDescription>
+      </ItemContent>
+      <ItemContent className="flex-none">
+        {isSuccess ? (
+          <ItemDescription>{json?.totalFeatures} features</ItemDescription>
+        ) : (
+          <ItemDescription className="text-destructive">
+            {!response.ok ? 'Could not load features' : 'Layer not found'}
+            <TriangleAlertIcon className="inline align-middle size-3 ml-1" />
+          </ItemDescription>
+        )}
+      </ItemContent>
+    </Item>
   );
 }
