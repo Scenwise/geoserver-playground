@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -10,26 +10,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { geoserverMaps } from '@/lib/db/schema';
-import { createInsertSchema } from 'drizzle-orm/zod';
-import { Controller, useForm } from 'react-hook-form';
+} from '@/components/ui/alert-dialog'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { geoserverMaps } from '@/lib/db/schema'
+import { createInsertSchema } from 'drizzle-orm/zod'
+import { Controller, useForm } from 'react-hook-form'
 import {
   UpsertGeoserverMap,
   updateGeoServerMap,
   insertGeoServerMap,
-} from '../actions/geoserver-map';
-import { zodResolver } from '@hookform/resolvers/zod';
-import z from 'zod';
-import { Spinner } from '@/components/ui/spinner';
-import { useState } from 'react';
-import { Textarea } from '@/components/ui/textarea';
+} from '../actions/geoserver-map'
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
+import { Spinner } from '@/components/ui/spinner'
+import { useState } from 'react'
+import { Textarea } from '@/components/ui/textarea'
 
 interface GeoserverMapFormProps {
-  data?: UpsertGeoserverMap;
-  children?: React.ReactNode;
+  data?: UpsertGeoserverMap
+  children?: React.ReactNode
 }
 
 export function GeoserverMapForm({
@@ -42,28 +42,28 @@ export function GeoserverMapForm({
   },
   children,
 }: GeoserverMapFormProps) {
-  const label = 'id' in data && data.id ? 'Edit' : 'Add';
+  const label = 'id' in data && data.id ? 'Edit' : 'Add'
 
   const formSchema = createInsertSchema(geoserverMaps, {
     version: z.coerce.number<number>().int().positive(),
-  });
+  })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: data,
-  });
+  })
 
   async function onSubmit(formData: z.infer<typeof formSchema>) {
     if ('id' in data && data.id) {
-      await updateGeoServerMap(data.id, formData);
+      await updateGeoServerMap(data.id, formData)
     } else {
-      await insertGeoServerMap(formData);
+      await insertGeoServerMap(formData)
     }
 
-    setIsOpen(false);
+    setIsOpen(false)
   }
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -193,5 +193,5 @@ export function GeoserverMapForm({
         </AlertDialogContent>
       </form>
     </AlertDialog>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import ScenwiseLogo from '@/components/scenwise-logo';
-import { Button } from '@/components/ui/button';
+import ScenwiseLogo from '@/components/scenwise-logo'
+import { Button } from '@/components/ui/button'
 import {
   Sidebar,
   SidebarContent,
@@ -12,9 +12,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { db } from '@/lib/db';
-import { geoserverMaps } from '@/lib/db/schema';
+} from '@/components/ui/sidebar'
+import { db } from '@/lib/db'
+import { geoserverMaps } from '@/lib/db/schema'
 import {
   ArrowLeft,
   ChevronsLeftRight,
@@ -22,23 +22,23 @@ import {
   Map,
   StarIcon,
   View,
-} from 'lucide-react';
-import Link from 'next/link';
-import { GeoserverMapForm } from './goeserver-map-form';
-import { ColoredBadge } from '@/components/colored-badge';
+} from 'lucide-react'
+import Link from 'next/link'
+import { GeoserverMapForm } from './goeserver-map-form'
+import { ColoredBadge } from '@/components/colored-badge'
 
 type AdminSidebarItem = {
-  title: string;
-  icon: React.ComponentType;
-  badge?: { icon?: React.ComponentType; label: string };
-  href?: string;
-};
+  title: string
+  icon: React.ComponentType
+  badge?: { icon?: React.ComponentType; label: string }
+  href?: string
+}
 
 type AdminSidebarGroup = {
-  label?: string;
-  action?: React.ReactNode;
-  items: AdminSidebarItem[];
-};
+  label?: string
+  action?: React.ReactNode
+  items: AdminSidebarItem[]
+}
 
 export default async function AdminSidebar() {
   const tools: AdminSidebarItem[] = [
@@ -52,19 +52,19 @@ export default async function AdminSidebar() {
       icon: View,
       badge: { label: 'Soon' },
     },
-  ];
+  ]
 
   const dbMaps = await db
     .select()
     .from(geoserverMaps)
-    .orderBy(geoserverMaps.name);
+    .orderBy(geoserverMaps.name)
 
   const maps: AdminSidebarItem[] = dbMaps.map((map) => ({
     title: map.name,
     icon: Map,
     href: `/admin/maps/${map.id}`,
     badge: map.isMain ? { icon: StarIcon, label: 'Main' } : undefined,
-  }));
+  }))
 
   const items: AdminSidebarGroup[] = [
     {
@@ -79,7 +79,7 @@ export default async function AdminSidebar() {
     },
     { label: 'Maps', items: maps },
     // { label: 'Tools', items: tools },
-  ];
+  ]
 
   return (
     <Sidebar variant="inset" className="*:bg-background">
@@ -152,5 +152,5 @@ export default async function AdminSidebar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  );
+  )
 }

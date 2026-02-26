@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from 'next/image'
 export default function ScenwiseLogo() {
   return (
     <div className="size-8 p-1 bg-black dark:bg-white rounded-sm grid place-items-center">
@@ -10,5 +10,5 @@ export default function ScenwiseLogo() {
         className="invert dark:invert-0"
       />
     </div>
-  );
+  )
 }

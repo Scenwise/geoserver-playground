@@ -1,27 +1,27 @@
-'use client';
+'use client'
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react'
 
-import 'ol/ol.css';
-import { Map, View } from 'ol';
-import { type MapOptions } from 'ol/Map';
-import TileLayer from 'ol/layer/Tile';
-import { TileWMS } from 'ol/source';
-import { MapboxVectorLayer } from 'ol-mapbox-style';
-import { State } from 'ol/View';
-import { useMapStyle } from '@/hooks/use-map-style';
-import { Button } from './ui/button';
-import { Minus, PaletteIcon, Plus, SatelliteIcon } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
-import { ButtonGroup } from './ui/button-group';
+import 'ol/ol.css'
+import { Map, View } from 'ol'
+import { type MapOptions } from 'ol/Map'
+import TileLayer from 'ol/layer/Tile'
+import { TileWMS } from 'ol/source'
+import { MapboxVectorLayer } from 'ol-mapbox-style'
+import { State } from 'ol/View'
+import { useMapStyle } from '@/hooks/use-map-style'
+import { Button } from './ui/button'
+import { Minus, PaletteIcon, Plus, SatelliteIcon } from 'lucide-react'
+import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group'
+import { ButtonGroup } from './ui/button-group'
 
-const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
 interface MapboxMapProps {
-  initialView?: Partial<State>;
-  onUpdateView?: (view: State) => void;
-  edgeLayerId?: string;
-  nodeLayerId?: string;
+  initialView?: Partial<State>
+  onUpdateView?: (view: State) => void
+  edgeLayerId?: string
+  nodeLayerId?: string
 }
 
 export function MapboxMap({
@@ -30,8 +30,8 @@ export function MapboxMap({
   edgeLayerId,
   nodeLayerId,
 }: MapboxMapProps) {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<Map>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<Map>(null)
 
   const [view] = useState<Partial<State>>(
     () =>
@@ -39,13 +39,13 @@ export function MapboxMap({
         center: [497598, 6785131],
         zoom: 17,
       },
-  );
+  )
 
-  const { styleUrl, isSatellite, setIsSatellite } = useMapStyle(mapRef);
+  const { styleUrl, isSatellite, setIsSatellite } = useMapStyle(mapRef)
 
   // Initialize the map on component mount
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    if (!mapContainerRef.current) return
 
     const map = new Map({
       target: mapContainerRef.current!,
@@ -76,49 +76,49 @@ export function MapboxMap({
         ...view,
       }),
       controls: [],
-    });
+    })
 
-    mapRef.current = map;
+    mapRef.current = map
 
     // Update center on map move
     map.on('moveend', () => {
-      const view = map.getView();
-      onUpdateView?.(view.getState());
-    });
+      const view = map.getView()
+      onUpdateView?.(view.getState())
+    })
 
-    return () => map.setTarget(undefined);
-  }, []);
+    return () => map.setTarget(undefined)
+  }, [])
 
   // Update the map view state
   useEffect(() => {
-    if (!mapRef.current || !view) return;
+    if (!mapRef.current || !view) return
 
-    const mapView = mapRef.current.getView();
-    const currentZoom = mapView.getZoom();
-    const currentCenter = mapView.getCenter();
+    const mapView = mapRef.current.getView()
+    const currentZoom = mapView.getZoom()
+    const currentCenter = mapView.getCenter()
 
-    const targetZoom = view.zoom !== currentZoom ? view.zoom : undefined;
+    const targetZoom = view.zoom !== currentZoom ? view.zoom : undefined
     const targetCenter =
       view.center &&
       (view.center[0] !== currentCenter?.[0] ||
         view.center[1] !== currentCenter?.[1])
         ? view.center
-        : undefined;
+        : undefined
 
     if (targetZoom || targetCenter) {
       mapView.animate({
         zoom: targetZoom,
         center: targetCenter,
         duration: 100,
-      });
+      })
     }
-  }, [view]);
+  }, [view])
 
   function zoom(value: number) {
-    if (!mapRef.current) return;
+    if (!mapRef.current) return
 
-    const view = mapRef.current.getView();
-    view.animate({ zoom: view.getZoom()! + value, duration: 100 });
+    const view = mapRef.current.getView()
+    view.animate({ zoom: view.getZoom()! + value, duration: 100 })
   }
 
   return (
@@ -153,5 +153,5 @@ export function MapboxMap({
         </ToggleGroupItem>
       </ToggleGroup>
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 export default function Home() {
   return (
@@ -9,5 +9,5 @@ export default function Home() {
         This section is currently under construction. Please check back later.
       </p>
     </div>
-  );
+  )
 }

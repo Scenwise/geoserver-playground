@@ -1,11 +1,11 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
-import AdminSidebar from './components/admin-sidebar';
-import React from 'react';
+import { SidebarProvider } from '@/components/ui/sidebar'
+import AdminSidebar from './components/admin-sidebar'
+import React from 'react'
 
 export default function AdminLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <SidebarProvider
@@ -16,5 +16,5 @@ export default function AdminLayout({
 
       <main className="grow">{children}</main>
     </SidebarProvider>
-  );
+  )
 }

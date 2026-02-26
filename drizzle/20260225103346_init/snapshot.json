@@ -1,8 +1,6 @@
 {
   "id": "4dc9a694-d837-4db6-a0c0-7b491e5079a5",
-  "prevIds": [
-    "00000000-0000-0000-0000-000000000000"
-  ],
+  "prevIds": ["00000000-0000-0000-0000-000000000000"],
   "version": "8",
   "dialect": "postgres",
   "ddl": [
@@ -13,9 +11,7 @@
       "entityType": "tables"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "geoserver_maps_pkey",
       "schema": "public",
@@ -98,9 +94,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "name"
-      ],
+      "columns": ["name"],
       "nullsNotDistinct": false,
       "name": "geoserver_maps_name_unique",
       "schema": "public",
@@ -109,9 +103,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "geoserverEdges"
-      ],
+      "columns": ["geoserverEdges"],
       "nullsNotDistinct": false,
       "name": "geoserver_maps_geoserverEdges_unique",
       "schema": "public",
@@ -120,9 +112,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "geoserverNodes"
-      ],
+      "columns": ["geoserverNodes"],
       "nullsNotDistinct": false,
       "name": "geoserver_maps_geoserverNodes_unique",
       "schema": "public",

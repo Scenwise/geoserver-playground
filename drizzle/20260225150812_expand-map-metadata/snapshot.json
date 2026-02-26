@@ -2,9 +2,7 @@
   "version": "8",
   "dialect": "postgres",
   "id": "92b06de1-eea2-409a-b993-2d2c8bf67c6f",
-  "prevIds": [
-    "4dc9a694-d837-4db6-a0c0-7b491e5079a5"
-  ],
+  "prevIds": ["4dc9a694-d837-4db6-a0c0-7b491e5079a5"],
   "ddl": [
     {
       "isRlsEnabled": false,
@@ -113,9 +111,7 @@
       "table": "geoserver_maps"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "geoserver_maps_pkey",
       "schema": "public",
@@ -124,9 +120,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "name"
-      ],
+      "columns": ["name"],
       "nullsNotDistinct": false,
       "name": "geoserver_maps_name_unique",
       "schema": "public",
@@ -135,9 +129,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "geoserverEdges"
-      ],
+      "columns": ["geoserverEdges"],
       "nullsNotDistinct": false,
       "name": "geoserver_maps_geoserverEdges_unique",
       "schema": "public",
@@ -146,9 +138,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "geoserverNodes"
-      ],
+      "columns": ["geoserverNodes"],
       "nullsNotDistinct": false,
       "name": "geoserver_maps_geoserverNodes_unique",
       "schema": "public",
@@ -157,9 +147,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "isMain"
-      ],
+      "columns": ["isMain"],
       "nullsNotDistinct": false,
       "name": "geoserver_maps_isMain_key",
       "schema": "public",

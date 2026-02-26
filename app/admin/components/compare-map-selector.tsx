@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,43 +8,43 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ChevronsUpDownIcon } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
+} from '@/components/ui/dropdown-menu'
+import { ChevronsUpDownIcon } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback } from 'react'
 
 type Map = {
-  id: number;
-  name: string;
-};
+  id: number
+  name: string
+}
 
 export function CompareMapSelector({
   map,
   maps,
   paramKey,
 }: {
-  map?: Map;
-  maps: Map[];
-  paramKey: string;
+  map?: Map
+  maps: Map[]
+  paramKey: string
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   // Get a new searchParams string by merging the current
   // searchParams with a provided key/value pair
   const createQueryString = useCallback(
     (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-      return params.toString();
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(name, value)
+      return params.toString()
     },
     [searchParams],
-  );
+  )
 
   const handleMapChange = (value: string) => {
-    router.replace(pathname + '?' + createQueryString(paramKey, value));
-  };
+    router.replace(pathname + '?' + createQueryString(paramKey, value))
+  }
 
   return (
     <DropdownMenu>
@@ -72,5 +72,5 @@ export function CompareMapSelector({
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

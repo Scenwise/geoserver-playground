@@ -1,37 +1,37 @@
-import { MapContainer } from '@/components/map-container';
-import { MapboxMap } from '@/components/mapbox-map';
-import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
-import { GeoserverMapForm } from '../../components/goeserver-map-form';
-import { geoserverMaps } from '@/lib/db/schema';
-import { FeatureCountBadge } from '../../components/feature-count-badge';
-import { Button } from '@/components/ui/button';
-import { setGeoServerMapMain } from '../../actions/geoserver-map';
-import { GeoserverMapMainButton } from '../../components/geoserver-map-main-button';
-import { ChevronsLeftRightIcon, PenIcon, StarIcon } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
-import { ColoredBadge } from '@/components/colored-badge';
-import { PageContainer, PageContent } from '@/components/page/page-container';
+import { MapContainer } from '@/components/map-container'
+import { MapboxMap } from '@/components/mapbox-map'
+import { db } from '@/lib/db'
+import { eq } from 'drizzle-orm'
+import { GeoserverMapForm } from '../../components/goeserver-map-form'
+import { geoserverMaps } from '@/lib/db/schema'
+import { FeatureCountBadge } from '../../components/feature-count-badge'
+import { Button } from '@/components/ui/button'
+import { setGeoServerMapMain } from '../../actions/geoserver-map'
+import { GeoserverMapMainButton } from '../../components/geoserver-map-main-button'
+import { ChevronsLeftRightIcon, PenIcon, StarIcon } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import Link from 'next/link'
+import { ColoredBadge } from '@/components/colored-badge'
+import { PageContainer, PageContent } from '@/components/page/page-container'
 import {
   PageHeader,
   PageHeaderActions,
   PageHeaderContent,
   PageHeaderDescription,
   PageHeaderTitle,
-} from '@/components/page/page-header';
+} from '@/components/page/page-header'
 
 export default async function MapPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }) {
-  const { id } = await params;
+  const { id } = await params
 
   const [map] = await db
     .select()
     .from(geoserverMaps)
-    .where(eq(geoserverMaps.id, Number(id)));
+    .where(eq(geoserverMaps.id, Number(id)))
 
   return (
     <PageContainer>
@@ -84,5 +84,5 @@ export default async function MapPage({
         </MapContainer>
       </PageContent>
     </PageContainer>
-  );
+  )
 }

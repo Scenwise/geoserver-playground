@@ -1,10 +1,10 @@
-import { SiteHeader } from '@/components/site-header';
-import React from 'react';
+import { SiteHeader } from '@/components/site-header'
+import React from 'react'
 
 export default function ClientLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <main
@@ -18,5 +18,5 @@ export default function ClientLayout({
       <SiteHeader />
       {children}
     </main>
-  );
+  )
 }

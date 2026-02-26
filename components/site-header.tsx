@@ -1,8 +1,8 @@
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ModeToggle } from './mode-toggle';
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { ModeToggle } from './mode-toggle'
 
-import ScenwiseLogo from './scenwise-logo';
+import ScenwiseLogo from './scenwise-logo'
 
 export function SiteHeader() {
   return (
@@ -21,5 +21,5 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
-  );
+  )
 }

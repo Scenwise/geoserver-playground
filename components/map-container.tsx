@@ -1,11 +1,11 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils'
 
 export function MapContainer({
   children,
   className = '',
 }: {
-  children: React.ReactNode;
-  className?: string;
+  children: React.ReactNode
+  className?: string
 }) {
   return (
     <div
@@ -16,5 +16,5 @@ export function MapContainer({
     >
       {children}
     </div>
-  );
+  )
 }

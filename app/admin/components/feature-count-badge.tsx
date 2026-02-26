@@ -1,32 +1,32 @@
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge'
 import {
   Item,
   ItemContent,
   ItemDescription,
   ItemMedia,
   ItemTitle,
-} from '@/components/ui/item';
-import { safeJson } from '@/lib/safe-json';
-import { GitCommitIcon, SplineIcon, TriangleAlertIcon } from 'lucide-react';
+} from '@/components/ui/item'
+import { safeJson } from '@/lib/safe-json'
+import { GitCommitIcon, SplineIcon, TriangleAlertIcon } from 'lucide-react'
 
 export async function FeatureCountBadge({
   id,
   type,
 }: {
-  id: string;
-  type: 'nodes' | 'edges';
+  id: string
+  type: 'nodes' | 'edges'
 }) {
   const BadgeIcon = {
     nodes: GitCommitIcon,
     edges: SplineIcon,
-  }[type];
+  }[type]
 
   const response = await fetch(
     `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${id}&outputFormat=application/json&maxFeatures=0`,
-  );
-  const { json, error } = await safeJson(response);
+  )
+  const { json, error } = await safeJson(response)
 
-  const isSuccess = response.ok && !error;
+  const isSuccess = response.ok && !error
 
   return (
     <Item variant="outline">
@@ -48,5 +48,5 @@ export async function FeatureCountBadge({
         )}
       </ItemContent>
     </Item>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-import { MapContainer } from '@/components/map-container';
-import { MapboxMap } from '@/components/mapbox-map';
-import { Button } from '@/components/ui/button';
+import { MapContainer } from '@/components/map-container'
+import { MapboxMap } from '@/components/mapbox-map'
+import { Button } from '@/components/ui/button'
 import {
   Item,
   ItemContent,
@@ -8,28 +8,25 @@ import {
   ItemDescription,
   ItemActions,
   ItemMedia,
-} from '@/components/ui/item';
-import { ResizablePanel } from '@/components/ui/resizable';
-import { db } from '@/lib/db';
-import { geoserverMaps } from '@/lib/db/schema';
-import Link from 'next/link';
-import { eq } from 'drizzle-orm';
-import { CompareMapSelector } from './compare-map-selector';
-import { ChevronRightIcon, MapIcon } from 'lucide-react';
+} from '@/components/ui/item'
+import { ResizablePanel } from '@/components/ui/resizable'
+import { db } from '@/lib/db'
+import { geoserverMaps } from '@/lib/db/schema'
+import Link from 'next/link'
+import { eq } from 'drizzle-orm'
+import { CompareMapSelector } from './compare-map-selector'
+import { ChevronRightIcon, MapIcon } from 'lucide-react'
 
 export async function CompareMap({
   id,
   paramKey,
 }: {
-  id?: string;
-  paramKey: string;
+  id?: string
+  paramKey: string
 }) {
-  const maps = await db
-    .select()
-    .from(geoserverMaps)
-    .orderBy(geoserverMaps.name);
+  const maps = await db.select().from(geoserverMaps).orderBy(geoserverMaps.name)
 
-  const map = id ? maps.find((m) => m.id === parseInt(id)) : undefined;
+  const map = id ? maps.find((m) => m.id === parseInt(id)) : undefined
 
   return (
     <CompareMapContainer>
@@ -67,7 +64,7 @@ export async function CompareMap({
         />
       </MapContainer>
     </CompareMapContainer>
-  );
+  )
 }
 
 function CompareMapContainer({ children }: { children: React.ReactNode }) {
@@ -79,5 +76,5 @@ function CompareMapContainer({ children }: { children: React.ReactNode }) {
     >
       {children}
     </ResizablePanel>
-  );
+  )
 }

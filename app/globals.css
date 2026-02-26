@@ -51,7 +51,8 @@
   --text-2xs: 0.625rem;
   --text-2xs--line-height: 0.75rem;
 
-  --shadow-centered: 0 0px 25px -5px var(--tw-shadow-color, rgb(0 0 0 / 0.1)),
+  --shadow-centered:
+    0 0px 25px -5px var(--tw-shadow-color, rgb(0 0 0 / 0.1)),
     0 8px 10px -6px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
 }
 

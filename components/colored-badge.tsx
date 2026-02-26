@@ -1,4 +1,4 @@
-import { Badge } from './ui/badge';
+import { Badge } from './ui/badge'
 
 interface ColoredBadgeProps extends React.ComponentProps<typeof Badge> {}
 
@@ -14,5 +14,5 @@ export function ColoredBadge({
     >
       {children}
     </Badge>
-  );
+  )
 }

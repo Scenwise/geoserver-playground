@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { MapboxMap } from '@/components/mapbox-map';
-import { Item, ItemFooter } from '@/components/ui/item';
+import { MapboxMap } from '@/components/mapbox-map'
+import { Item, ItemFooter } from '@/components/ui/item'
 
 export default function Home() {
   return (
@@ -12,5 +12,5 @@ export default function Home() {
         </ItemFooter>
       </Item>
     </main>
-  );
+  )
 }
