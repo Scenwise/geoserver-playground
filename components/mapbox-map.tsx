@@ -18,6 +18,7 @@ import { ButtonGroup } from './ui/button-group'
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
 interface MapboxMapProps {
+  mapRef?: React.RefObject<Map | null>
   initialView?: Partial<State>
   onUpdateView?: (view: State) => void
   edgeLayerId?: string
@@ -25,13 +26,13 @@ interface MapboxMapProps {
 }
 
 export function MapboxMap({
+  mapRef = useRef<Map>(null),
   initialView,
   onUpdateView,
   edgeLayerId,
   nodeLayerId,
 }: MapboxMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<Map>(null)
 
   const [view] = useState<Partial<State>>(
     () =>

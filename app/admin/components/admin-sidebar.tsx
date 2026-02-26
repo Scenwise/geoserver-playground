@@ -50,7 +50,7 @@ export default async function AdminSidebar() {
     {
       title: 'Street View',
       icon: View,
-      badge: { label: 'Soon' },
+      href: '/admin/streetview',
     },
   ]
 

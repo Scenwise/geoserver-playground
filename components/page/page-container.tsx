@@ -12,7 +12,7 @@ export function PageContent({
   children,
   className,
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
 }) {
   return <div className={cn('px-4', className)}>{children}</div>
