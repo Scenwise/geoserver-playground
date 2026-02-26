@@ -40,3 +40,11 @@ export async function setGeoServerMapMain(id: number) {
 
   refresh()
 }
+
+export async function getMainGeoServerMap() {
+  const [mainMap] = await db
+    .select()
+    .from(geoserverMaps)
+    .where(eq(geoserverMaps.isMain, true))
+  return mainMap
+}

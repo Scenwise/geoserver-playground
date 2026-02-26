@@ -1,5 +1,4 @@
-import { MapContainer } from '@/components/map-container'
-import { MapboxMap } from '@/components/mapbox-map'
+import { OpenLayersMap, MapContainer } from '@/components/openlayers-map'
 import { Button } from '@/components/ui/button'
 import {
   Item,
@@ -13,7 +12,6 @@ import { ResizablePanel } from '@/components/ui/resizable'
 import { db } from '@/lib/db'
 import { geoserverMaps } from '@/lib/db/schema'
 import Link from 'next/link'
-import { eq } from 'drizzle-orm'
 import { CompareMapSelector } from './compare-map-selector'
 import { ChevronRightIcon, MapIcon } from 'lucide-react'
 
@@ -57,7 +55,7 @@ export async function CompareMap({
       )}
 
       <MapContainer className="grow">
-        <MapboxMap
+        <OpenLayersMap
           key={`map-${map?.id}`}
           edgeLayerId={map?.geoserverEdges}
           nodeLayerId={map?.geoserverNodes}

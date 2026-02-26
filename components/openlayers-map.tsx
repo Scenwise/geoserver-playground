@@ -14,10 +14,11 @@ import { Button } from './ui/button'
 import { Minus, PaletteIcon, Plus, SatelliteIcon } from 'lucide-react'
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group'
 import { ButtonGroup } from './ui/button-group'
+import { cn } from '@/lib/utils'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
-interface MapboxMapProps {
+interface OpenLayersProps {
   mapRef?: React.RefObject<Map | null>
   initialView?: Partial<State>
   onUpdateView?: (view: State) => void
@@ -25,13 +26,13 @@ interface MapboxMapProps {
   nodeLayerId?: string
 }
 
-export function MapboxMap({
+export function OpenLayersMap({
   mapRef = useRef<Map>(null),
   initialView,
   onUpdateView,
   edgeLayerId,
   nodeLayerId,
-}: MapboxMapProps) {
+}: OpenLayersProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
 
   const [view] = useState<Partial<State>>(
@@ -153,6 +154,25 @@ export function MapboxMap({
           Satellite
         </ToggleGroupItem>
       </ToggleGroup>
+    </div>
+  )
+}
+
+export function MapContainer({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <div
+      className={cn(
+        'rounded-xl basis-0 grow overflow-hidden shadow-centered bg-card border-4 border-white dark:ring-white/10',
+        className,
+      )}
+    >
+      {children}
     </div>
   )
 }

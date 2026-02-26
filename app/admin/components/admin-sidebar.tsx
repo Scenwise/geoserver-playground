@@ -24,7 +24,6 @@ import {
   View,
 } from 'lucide-react'
 import Link from 'next/link'
-import { GeoserverMapForm } from './goeserver-map-form'
 import { ColoredBadge } from '@/components/colored-badge'
 
 type AdminSidebarItem = {
@@ -48,7 +47,7 @@ export default async function AdminSidebar() {
       href: '/admin/compare',
     },
     {
-      title: 'Street View',
+      title: 'Streetview',
       icon: View,
       href: '/admin/streetview',
     },

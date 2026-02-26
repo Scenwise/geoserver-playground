@@ -1,5 +1,4 @@
-import { MapContainer } from '@/components/map-container'
-import { MapboxMap } from '@/components/mapbox-map'
+import { OpenLayersMap, MapContainer } from '@/components/openlayers-map'
 import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { GeoserverMapForm } from '../../components/goeserver-map-form'
@@ -77,7 +76,7 @@ export default async function MapPage({
 
       <PageContent className="grow flex">
         <MapContainer>
-          <MapboxMap
+          <OpenLayersMap
             edgeLayerId={map.geoserverEdges}
             nodeLayerId={map.geoserverNodes}
           />

@@ -1,16 +1,19 @@
 'use client'
 
 import { coordinateToLatLng, latLngToCoordinate } from '@/lib/google-maps'
+import { cn } from '@/lib/utils'
 import { SquareMousePointerIcon } from 'lucide-react'
 import { Coordinate } from 'ol/coordinate'
 import { useEffect, useRef } from 'react'
 
-export function StreetviewPano({
+export function StreetviewPanorama({
   position,
   onPositionChange,
+  className = '',
 }: {
   position?: Coordinate
   onPositionChange?: (position: Coordinate) => void
+  className?: string
 }) {
   const containerRef = useRef(null)
   const panoramaRef = useRef<google.maps.StreetViewPanorama>(null)
@@ -33,6 +36,12 @@ export function StreetviewPano({
         position,
         pov: { heading: 0, pitch: 0 },
         zoom: 1,
+        fullscreenControl: false,
+        addressControl: false,
+        linksControl: false,
+        zoomControl: false,
+        panControl: false,
+        imageDateControl: false,
       },
     )
 
@@ -56,11 +65,15 @@ export function StreetviewPano({
   return (
     <div
       ref={containerRef}
-      className="w-full aspect-4/3 rounded-2xl border-2 border-dashed border-border flex items-center justify-center p-6 text-center flex-col gap-4"
+      className={cn(
+        'w-full h-full rounded-2xl flex items-center justify-center p-6 text-center flex-col gap-4',
+        className,
+        position ? 'shadow-lg' : 'border-2 border-dashed border-border',
+      )}
     >
       <SquareMousePointerIcon className="size-10 text-muted-foreground" />
       <p className="text-muted-foreground text-sm">
-        Click a location on the map to open StreetView.
+        Click a location on the map to open streetview.
       </p>
     </div>
   )

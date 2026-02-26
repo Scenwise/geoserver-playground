@@ -9,8 +9,6 @@ import {
   PageHeaderTitle,
 } from '@/components/page/page-header'
 import { CompareMapSwap } from '../components/compare-map-swap'
-import { Toggle } from '@/components/ui/toggle'
-import { LinkIcon } from 'lucide-react'
 
 export default async function ComparePage({
   searchParams,

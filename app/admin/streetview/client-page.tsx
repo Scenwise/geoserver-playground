@@ -1,0 +1,121 @@
+'use client'
+
+import { geoserverMaps } from '@/lib/db/schema'
+
+import { OpenLayersMap, MapContainer } from '@/components/openlayers-map'
+import { PageContainer, PageContent } from '@/components/page/page-container'
+import {
+  PageHeader,
+  PageHeaderActions,
+  PageHeaderContent,
+  PageHeaderTitle,
+} from '@/components/page/page-header'
+import { StreetviewPanorama } from '../components/streetview-panorama'
+import { useEffect, useRef, useState } from 'react'
+import { Feature, Map } from 'ol'
+import VectorSource from 'ol/source/Vector'
+import VectorLayer from 'ol/layer/Vector'
+import { Icon, Style } from 'ol/style'
+import { Point } from 'ol/geom'
+import { Coordinate } from 'ol/coordinate'
+import { StreetviewSegmentation } from '../components/streetview-segmentation'
+import { Button } from '@/components/ui/button'
+import { RefreshCcwIcon } from 'lucide-react'
+
+export function StreetviewClientPage({
+  map,
+}: {
+  map?: typeof geoserverMaps.$inferSelect
+}) {
+  const [swappedLayout, setSwappedLayout] = useState(false)
+
+  const [position, setPosition] = useState<Coordinate>()
+
+  const mapRef = useRef<Map | null>(null)
+  const clickSource = useRef<VectorSource>(new VectorSource())
+
+  useEffect(() => {
+    if (!mapRef.current) return
+
+    initializeStreetViewLayer()
+
+    mapRef.current.on('click', (evt) => {
+      updatePosition(evt.coordinate)
+    })
+  }, [mapRef])
+
+  function initializeStreetViewLayer() {
+    const clickLayer = new VectorLayer({
+      source: clickSource.current,
+      style: new Style({
+        image: new Icon({
+          anchor: [0.5, 1],
+          src: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
+        }),
+      }),
+    })
+
+    mapRef.current!.addLayer(clickLayer)
+  }
+
+  function updatePosition(position: Coordinate) {
+    setPosition(position)
+
+    clickSource.current.clear()
+
+    const feature = new Feature({ geometry: new Point(position) })
+    clickSource.current.addFeature(feature)
+
+    // Keep the map centered on the new position
+    mapRef.current!.getView().animate({
+      center: position,
+      duration: 100,
+    })
+  }
+
+  return (
+    <PageContainer className="max-h-screen">
+      <PageHeader>
+        <PageHeaderContent>
+          <PageHeaderTitle>Streetview</PageHeaderTitle>
+        </PageHeaderContent>
+
+        <PageHeaderActions>
+          <Button
+            onClick={() => setSwappedLayout(!swappedLayout)}
+            variant="secondary"
+          >
+            <RefreshCcwIcon />
+            Swap layout
+          </Button>
+        </PageHeaderActions>
+      </PageHeader>
+      <PageContent className="grow grid gap-6 grid-cols-3 grid-rows-2">
+        <MapContainer
+          className={
+            swappedLayout ? 'col-[3/4] row-[1/2]' : 'col-[1/3] row-[1/3]'
+          }
+        >
+          <OpenLayersMap
+            mapRef={mapRef}
+            nodeLayerId={map?.geoserverNodes}
+            edgeLayerId={map?.geoserverEdges}
+          />
+        </MapContainer>
+
+        <StreetviewPanorama
+          className={
+            swappedLayout ? 'col-[1/3] row-[1/3]' : 'col-[3/4] row-[1/2]'
+          }
+          position={position}
+          onPositionChange={updatePosition}
+        />
+
+        <StreetviewSegmentation
+          className="col-[3/4] row-[2/3]"
+          position={position}
+        />
+      </PageContent>
+    </PageContainer>
+  )
+}
