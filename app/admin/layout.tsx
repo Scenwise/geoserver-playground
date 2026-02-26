@@ -10,6 +10,7 @@ export default function AdminLayout({
   return (
     <SidebarProvider
       style={{ '--sidebar-width': '20rem' } as React.CSSProperties}
+      className="has-data-[variant=inset]:bg-background"
     >
       <AdminSidebar />
 

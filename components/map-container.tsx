@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 export function MapContainer({
   children,
   className = '',
@@ -7,7 +9,10 @@ export function MapContainer({
 }) {
   return (
     <div
-      className={`rounded-xl basis-0 grow overflow-hidden shadow-xl bg-card ring-4 ring-white dark:ring-white/10 ${className}`}
+      className={cn(
+        'rounded-xl basis-0 grow overflow-hidden shadow-centered bg-card border-4 border-white dark:ring-white/10',
+        className,
+      )}
     >
       {children}
     </div>

@@ -11,6 +11,15 @@ import { GeoserverMapMainButton } from '../../components/geoserver-map-main-butt
 import { ChevronsLeftRightIcon, PenIcon, StarIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { ColoredBadge } from '@/components/colored-badge';
+import { PageContainer, PageContent } from '@/components/page/page-container';
+import {
+  PageHeader,
+  PageHeaderActions,
+  PageHeaderContent,
+  PageHeaderDescription,
+  PageHeaderTitle,
+} from '@/components/page/page-header';
 
 export default async function MapPage({
   params,
@@ -25,57 +34,55 @@ export default async function MapPage({
     .where(eq(geoserverMaps.id, Number(id)));
 
   return (
-    <div className="min-h-svh flex flex-col px-4 pt-12 pb-4 space-y-6">
-      <header className="flex items-center justify-between">
-        <div className="space-y-2">
+    <PageContainer>
+      <PageHeader>
+        <PageHeaderContent>
           <div className="flex items-center gap-2">
-            <h1 className="scroll-m-24 text-3xl font-semibold tracking-tight sm:text-3xl">
-              {map?.name}
-            </h1>
+            <PageHeaderTitle>{map?.name}</PageHeaderTitle>
+
             {map.isMain && (
-              <Badge
-                variant="secondary"
-                className="bg-purple-50 text-purple-700 border border-purple-700 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-300 "
-              >
+              <ColoredBadge className="bg-purple-100 text-purple-700  dark:bg-purple-900 dark:text-purple-300  ">
                 <StarIcon />
                 Main map
-              </Badge>
+              </ColoredBadge>
             )}
           </div>
 
           {map?.description && (
-            <p className="text-muted-foreground">{map.description}</p>
+            <PageHeaderDescription>{map.description}</PageHeaderDescription>
           )}
-        </div>
+        </PageHeaderContent>
 
-        <div className="flex gap-2 items-center">
+        <PageHeaderActions>
           <GeoserverMapMainButton map={{ id: map?.id, isMain: map?.isMain }} />
           <GeoserverMapForm data={map}>
-            <Button variant="outline" size="sm">
+            <Button variant="secondary">
               <PenIcon />
               Edit
             </Button>
           </GeoserverMapForm>
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/admin/compare`}>
+          <Button asChild variant="secondary">
+            <Link href={`/admin/compare?map1=${map?.id}`}>
               <ChevronsLeftRightIcon />
               Compare
             </Link>
           </Button>
-        </div>
-      </header>
+        </PageHeaderActions>
+      </PageHeader>
 
-      <div className="flex gap-4">
+      <PageContent className="flex gap-4">
         <FeatureCountBadge id={map?.geoserverNodes || ''} type="nodes" />
         <FeatureCountBadge id={map?.geoserverEdges || ''} type="edges" />
-      </div>
+      </PageContent>
 
-      <MapContainer className="grow">
-        <MapboxMap
-          edgeLayerId={map.geoserverEdges}
-          nodeLayerId={map.geoserverNodes}
-        />
-      </MapContainer>
-    </div>
+      <PageContent className="grow flex">
+        <MapContainer>
+          <MapboxMap
+            edgeLayerId={map.geoserverEdges}
+            nodeLayerId={map.geoserverNodes}
+          />
+        </MapContainer>
+      </PageContent>
+    </PageContainer>
   );
 }

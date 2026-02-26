@@ -1,5 +1,4 @@
 import ScenwiseLogo from '@/components/scenwise-logo';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Sidebar,
@@ -26,6 +25,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { GeoserverMapForm } from './goeserver-map-form';
+import { ColoredBadge } from '@/components/colored-badge';
 
 type AdminSidebarItem = {
   title: string;
@@ -74,14 +74,15 @@ export default async function AdminSidebar() {
           icon: Gauge,
           href: '/admin',
         } satisfies AdminSidebarItem,
+        ...tools,
       ],
     },
-    { label: 'Maps', items: maps, action: <GeoserverMapForm /> },
-    { label: 'Tools', items: tools },
+    { label: 'Maps', items: maps },
+    // { label: 'Tools', items: tools },
   ];
 
   return (
-    <Sidebar variant="inset">
+    <Sidebar variant="inset" className="*:bg-background">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex gap-2 items-center px-2 text-base">
@@ -100,7 +101,7 @@ export default async function AdminSidebar() {
               <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
             )}
             {group.action && (
-              <SidebarGroupAction asChild>{group.action}</SidebarGroupAction>
+              <SidebarGroupAction>{group.action}</SidebarGroupAction>
             )}
 
             <SidebarGroupContent>
@@ -119,12 +120,12 @@ export default async function AdminSidebar() {
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
                         {item.badge && (
-                          <Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300 ml-auto">
+                          <ColoredBadge className="ml-auto">
                             {item.badge.icon && (
                               <item.badge.icon className="w-3 h-3 mr-1" />
                             )}
                             {item.badge.label}
-                          </Badge>
+                          </ColoredBadge>
                         )}
                       </Link>
                     </SidebarMenuButton>

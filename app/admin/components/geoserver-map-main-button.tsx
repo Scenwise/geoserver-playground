@@ -12,7 +12,7 @@ export function GeoserverMapMainButton({
   if (isMain) return null;
 
   return (
-    <Button variant="outline" size="sm" onClick={() => setGeoServerMapMain(id)}>
+    <Button variant="secondary" onClick={() => setGeoServerMapMain(id)}>
       <StarIcon />
       Make main
     </Button>
