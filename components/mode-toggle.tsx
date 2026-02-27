@@ -3,44 +3,27 @@
 import { ComputerIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-
-export function ModeDropdown() {
-  const { setTheme } = useTheme()
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <SunIcon className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-          <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
+import { useState, useEffect } from 'react'
 
 export function ModeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme } = useTheme()
+
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return <InternalToggleGroup />
+
+  return <InternalToggleGroup theme={theme} />
+}
+
+// To avoid SSR hydration mismatch, render a toggle group without value on the
+// server, and only render the one with value on the client after mounting.
+function InternalToggleGroup({ theme }: { theme?: string }) {
+  const { setTheme } = useTheme()
 
   const themes = [
     { value: 'light', icon: <SunIcon /> },
@@ -51,8 +34,8 @@ export function ModeToggle() {
   return (
     <ToggleGroup
       type="single"
-      value={theme}
-      onValueChange={(value) => setTheme(value)}
+      value={theme || undefined}
+      onValueChange={(value) => setTheme && setTheme(value)}
       variant="outline"
       className="grow w-full"
       size="sm"

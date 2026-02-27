@@ -1,6 +1,5 @@
 import { PageContainer } from '@/components/page/page-container'
-import { CompareMap } from '../components/compare-map'
-import { ResizableHandle, ResizablePanelGroup } from '@/components/ui/resizable'
+import { CompareMapSelector } from '../components/compare-map-selector'
 import {
   PageHeader,
   PageHeaderActions,
@@ -9,6 +8,10 @@ import {
   PageHeaderTitle,
 } from '@/components/page/page-header'
 import { CompareMapSwap } from '../components/compare-map-swap'
+import { CompareMaps } from '../components/compare-maps'
+import { geoserverMaps } from '@/lib/db/schema'
+import { db } from '@/lib/db'
+import { eq } from 'drizzle-orm'
 
 export default async function ComparePage({
   searchParams,
@@ -17,10 +20,16 @@ export default async function ComparePage({
 }) {
   const { map1, map2 } = await searchParams
 
-  // const [view, setView] = useState<Partial<State>>({
-  //   center: [497598, 6785131],
-  //   zoom: 17,
-  // });
+  const getMap = (id?: string) =>
+    id
+      ? db
+          .select()
+          .from(geoserverMaps)
+          .where(eq(geoserverMaps.id, parseInt(id)))
+          .then((maps) => maps[0])
+      : undefined
+
+  const [map1Data, map2Data] = await Promise.all([getMap(map1), getMap(map2)])
 
   return (
     <PageContainer>
@@ -33,23 +42,16 @@ export default async function ComparePage({
         </PageHeaderContent>
 
         <PageHeaderActions>
-          {/* <Toggle variant="outline">
-            <LinkIcon />
-            Link views
-          </Toggle> */}
-
           <CompareMapSwap />
         </PageHeaderActions>
       </PageHeader>
 
-      <ResizablePanelGroup
-        orientation="horizontal"
-        className="min-h-0 grow -mb-4"
-      >
-        <CompareMap id={map1} paramKey="map1" />
-        <ResizableHandle className="my-4" withHandle />
-        <CompareMap id={map2} paramKey="map2" />
-      </ResizablePanelGroup>
+      <div className="grid grid-cols-2 gap-8.25 px-4 mb-2">
+        <CompareMapSelector map={map1Data} paramKey="map1" />
+        <CompareMapSelector map={map2Data} paramKey="map2" />
+      </div>
+
+      <CompareMaps map1={map1Data} map2={map2Data} />
     </PageContainer>
   )
 }

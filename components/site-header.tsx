@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ModeDropdown } from './mode-toggle'
+import { ModeDropdown } from './mode-dropdown'
 
 import ScenwiseLogo from './scenwise-logo'
 

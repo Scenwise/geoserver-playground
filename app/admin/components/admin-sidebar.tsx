@@ -152,7 +152,9 @@ export default async function AdminSidebar() {
 
         <SidebarMenu>
           <SidebarMenuItem>
-            <ModeToggle />
+            <SidebarMenuButton asChild>
+              <ModeToggle />
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

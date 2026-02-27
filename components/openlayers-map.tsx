@@ -21,7 +21,6 @@ const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 interface OpenLayersProps {
   mapRef?: React.RefObject<Map | null>
   initialView?: Partial<State>
-  onUpdateView?: (view: State) => void
   edgeLayerId?: string
   nodeLayerId?: string
 }
@@ -29,7 +28,6 @@ interface OpenLayersProps {
 export function OpenLayersMap({
   mapRef = useRef<Map>(null),
   initialView,
-  onUpdateView,
   edgeLayerId,
   nodeLayerId,
 }: OpenLayersProps) {
@@ -82,39 +80,8 @@ export function OpenLayersMap({
 
     mapRef.current = map
 
-    // Update center on map move
-    map.on('moveend', () => {
-      const view = map.getView()
-      onUpdateView?.(view.getState())
-    })
-
     return () => map.setTarget(undefined)
   }, [])
-
-  // Update the map view state
-  useEffect(() => {
-    if (!mapRef.current || !view) return
-
-    const mapView = mapRef.current.getView()
-    const currentZoom = mapView.getZoom()
-    const currentCenter = mapView.getCenter()
-
-    const targetZoom = view.zoom !== currentZoom ? view.zoom : undefined
-    const targetCenter =
-      view.center &&
-      (view.center[0] !== currentCenter?.[0] ||
-        view.center[1] !== currentCenter?.[1])
-        ? view.center
-        : undefined
-
-    if (targetZoom || targetCenter) {
-      mapView.animate({
-        zoom: targetZoom,
-        center: targetCenter,
-        duration: 100,
-      })
-    }
-  }, [view])
 
   function zoom(value: number) {
     if (!mapRef.current) return

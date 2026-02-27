@@ -1,46 +1,77 @@
-import { OpenLayersMap, MapContainer } from '@/components/openlayers-map'
+import { MapContainer, OpenLayersMap } from '@/components/openlayers-map'
 import { ResizablePanel } from '@/components/ui/resizable'
-import { db } from '@/lib/db'
 import { geoserverMaps } from '@/lib/db/schema'
-import { CompareMapSelector } from './compare-map-selector'
-import { GeoserverMapItem } from './geoserver-map-item'
+import { useEffect, useRef } from 'react'
 
-export async function CompareMap({
-  id,
-  paramKey,
+import { Map } from 'ol'
+import { State } from 'ol/View'
+
+export function CompareMap({
+  map,
+  view,
+  onViewChange,
 }: {
-  id?: string
-  paramKey: string
+  map?: typeof geoserverMaps.$inferSelect
+  view?: Partial<State>
+  onViewChange?: (view: State) => void
 }) {
-  const maps = await db.select().from(geoserverMaps).orderBy(geoserverMaps.name)
+  const mapRef = useRef<Map | null>(null)
 
-  const map = id ? maps.find((m) => m.id === parseInt(id)) : undefined
+  // Register view change listener
+  useEffect(() => {
+    if (!mapRef.current || !onViewChange) return
 
-  return (
-    <CompareMapContainer>
-      <CompareMapSelector map={map} maps={maps} paramKey={paramKey} />
+    mapRef.current.on('moveend', () => {
+      const view = mapRef.current?.getView()
+      if (view) onViewChange?.(view.getState())
+    })
+  }, [onViewChange])
 
-      {map && <GeoserverMapItem map={map} />}
+  // Update the map view state
+  useEffect(() => {
+    if (!mapRef.current || !view) return
 
-      <MapContainer className="grow">
-        <OpenLayersMap
-          key={`map-${map?.id}`}
-          edgeLayerId={map?.geoserverEdges}
-          nodeLayerId={map?.geoserverNodes}
-        />
-      </MapContainer>
-    </CompareMapContainer>
-  )
-}
+    const mapView = mapRef.current.getView()
 
-function CompareMapContainer({ children }: { children: React.ReactNode }) {
+    const currentZoom = mapView.getZoom()
+    const targetZoom = view.zoom !== currentZoom ? view.zoom : undefined
+    if (targetZoom) {
+      mapView.animate({
+        zoom: targetZoom,
+        duration: 100,
+      })
+    }
+
+    const currentCenter = mapView.getCenter()
+    const targetCenter =
+      view.center &&
+      (view.center[0] !== currentCenter?.[0] ||
+        view.center[1] !== currentCenter?.[1])
+        ? view.center
+        : undefined
+
+    if (targetCenter) {
+      mapView.animate({
+        center: targetCenter,
+        duration: 100,
+      })
+    }
+  }, [view])
+
   return (
     <ResizablePanel
       className="p-4 flex flex-col h-full items-stretch gap-4"
       minSize="35%"
       defaultSize="50%"
     >
-      {children}
+      <MapContainer className="grow">
+        <OpenLayersMap
+          key={`map-${map?.id}`}
+          edgeLayerId={map?.geoserverEdges}
+          nodeLayerId={map?.geoserverNodes}
+          mapRef={mapRef}
+        />
+      </MapContainer>
     </ResizablePanel>
   )
 }
