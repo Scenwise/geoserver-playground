@@ -46,11 +46,12 @@ export function GeoserverMapForm({
 
   const formSchema = createInsertSchema(geoserverMaps, {
     version: z.coerce.number<number>().int().positive(),
+    description: z.string().optional(),
   })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: data,
+    defaultValues: { ...data, description: data.description ?? '' },
   })
 
   async function onSubmit(formData: z.infer<typeof formSchema>) {
