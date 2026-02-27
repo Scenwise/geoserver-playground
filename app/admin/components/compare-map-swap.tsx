@@ -18,7 +18,11 @@ export function CompareMapSwap() {
   }
 
   return (
-    <Button variant="secondary" onClick={swapMaps}>
+    <Button
+      variant="secondary"
+      onClick={swapMaps}
+      disabled={!searchParams.get('map1') || !searchParams.get('map2')}
+    >
       <ArrowLeftRightIcon />
       Swap maps
     </Button>

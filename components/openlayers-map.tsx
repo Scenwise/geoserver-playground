@@ -168,7 +168,7 @@ export function MapContainer({
   return (
     <div
       className={cn(
-        'rounded-xl basis-0 grow overflow-hidden shadow-centered bg-card border-4 border-white dark:ring-white/10',
+        'rounded-xl basis-0 grow overflow-hidden shadow-centered bg-card border-4 border-white dark:border-white/10',
         className,
       )}
     >

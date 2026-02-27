@@ -1,19 +1,9 @@
 import { OpenLayersMap, MapContainer } from '@/components/openlayers-map'
-import { Button } from '@/components/ui/button'
-import {
-  Item,
-  ItemContent,
-  ItemTitle,
-  ItemDescription,
-  ItemActions,
-  ItemMedia,
-} from '@/components/ui/item'
 import { ResizablePanel } from '@/components/ui/resizable'
 import { db } from '@/lib/db'
 import { geoserverMaps } from '@/lib/db/schema'
-import Link from 'next/link'
 import { CompareMapSelector } from './compare-map-selector'
-import { ChevronRightIcon, MapIcon } from 'lucide-react'
+import { GeoserverMapItem } from './geoserver-map-item'
 
 export async function CompareMap({
   id,
@@ -30,29 +20,7 @@ export async function CompareMap({
     <CompareMapContainer>
       <CompareMapSelector map={map} maps={maps} paramKey={paramKey} />
 
-      {map && (
-        <Item variant="outline">
-          <ItemMedia variant="icon">
-            <MapIcon />
-          </ItemMedia>
-          <ItemContent>
-            <ItemTitle className="overflow-visible">{map?.name}</ItemTitle>
-            {map?.description && (
-              <ItemDescription>{map.description}</ItemDescription>
-            )}
-          </ItemContent>
-          <ItemActions>
-            {map && (
-              <Button asChild variant="secondary" size="sm">
-                <Link href={`/admin/maps/${map?.id}`}>
-                  Details
-                  <ChevronRightIcon />
-                </Link>
-              </Button>
-            )}
-          </ItemActions>
-        </Item>
-      )}
+      {map && <GeoserverMapItem map={map} />}
 
       <MapContainer className="grow">
         <OpenLayersMap

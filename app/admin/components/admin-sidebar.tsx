@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { ColoredBadge } from '@/components/colored-badge'
+import { ModeToggle } from '@/components/mode-toggle'
 
 type AdminSidebarItem = {
   title: string
@@ -73,11 +74,10 @@ export default async function AdminSidebar() {
           icon: Gauge,
           href: '/admin',
         } satisfies AdminSidebarItem,
-        ...tools,
       ],
     },
+    { label: 'Tools', items: tools },
     { label: 'Maps', items: maps },
-    // { label: 'Tools', items: tools },
   ]
 
   return (
@@ -140,13 +140,19 @@ export default async function AdminSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Button color="primary" size="sm" asChild>
+              <Button color="primary" asChild>
                 <Link href="/">
                   <ArrowLeft />
                   Main application
                 </Link>
               </Button>
             </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <ModeToggle />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

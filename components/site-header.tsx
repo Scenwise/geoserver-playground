@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ModeToggle } from './mode-toggle'
+import { ModeDropdown } from './mode-toggle'
 
 import ScenwiseLogo from './scenwise-logo'
 
@@ -17,7 +17,7 @@ export function SiteHeader() {
             <Link href="/admin">Admin</Link>
           </Button>
 
-          <ModeToggle />
+          <ModeDropdown />
         </div>
       </div>
     </header>

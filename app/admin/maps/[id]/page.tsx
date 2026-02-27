@@ -19,6 +19,11 @@ import {
   PageHeaderDescription,
   PageHeaderTitle,
 } from '@/components/page/page-header'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export default async function MapPage({
   params,
@@ -40,10 +45,18 @@ export default async function MapPage({
             <PageHeaderTitle>{map?.name}</PageHeaderTitle>
 
             {map.isMain && (
-              <ColoredBadge className="bg-purple-100 text-purple-700  dark:bg-purple-900 dark:text-purple-300  ">
-                <StarIcon />
-                Main map
-              </ColoredBadge>
+              <Tooltip>
+                <TooltipTrigger>
+                  <ColoredBadge className="bg-purple-100 text-purple-700  dark:bg-purple-900 dark:text-purple-300  ">
+                    <StarIcon />
+                    Main map
+                  </ColoredBadge>
+                </TooltipTrigger>
+
+                <TooltipContent side="right">
+                  This map will be used in the main application
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
 
