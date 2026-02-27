@@ -1,3 +1,5 @@
+'use server'
+
 import { PageContainer, PageContent } from '@/components/page/page-container'
 import {
   PageHeader,

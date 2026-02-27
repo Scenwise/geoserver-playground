@@ -1,3 +1,5 @@
+'use server'
+
 import { db } from '@/lib/db'
 import { geoserverMaps } from '@/lib/db/schema'
 import { CompareMapDropdown } from './compare-map-dropdown'

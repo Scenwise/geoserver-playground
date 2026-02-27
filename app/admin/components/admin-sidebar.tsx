@@ -1,3 +1,5 @@
+'use server'
+
 import ScenwiseLogo from '@/components/scenwise-logo'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,14 +17,7 @@ import {
 } from '@/components/ui/sidebar'
 import { db } from '@/lib/db'
 import { geoserverMaps } from '@/lib/db/schema'
-import {
-  ArrowLeft,
-  ChevronsLeftRight,
-  Gauge,
-  Map,
-  StarIcon,
-  View,
-} from 'lucide-react'
+import { ArrowLeft, Gauge, Map, StarIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ColoredBadge } from '@/components/colored-badge'
 import { ModeToggle } from '@/components/mode-toggle'
