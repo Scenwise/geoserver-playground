@@ -26,34 +26,13 @@ import {
 import Link from 'next/link'
 import { ColoredBadge } from '@/components/colored-badge'
 import { ModeToggle } from '@/components/mode-toggle'
-
-type AdminSidebarItem = {
-  title: string
-  icon: React.ComponentType
-  badge?: { icon?: React.ComponentType; label: string }
-  href?: string
-}
-
-type AdminSidebarGroup = {
-  label?: string
-  action?: React.ReactNode
-  items: AdminSidebarItem[]
-}
+import {
+  AdminSidebarGroup,
+  AdminSidebarItem,
+  tools,
+} from '../data/admin-sidebar'
 
 export default async function AdminSidebar() {
-  const tools: AdminSidebarItem[] = [
-    {
-      title: 'Compare',
-      icon: ChevronsLeftRight,
-      href: '/admin/compare',
-    },
-    {
-      title: 'Streetview',
-      icon: View,
-      href: '/admin/streetview',
-    },
-  ]
-
   const dbMaps = await db
     .select()
     .from(geoserverMaps)
@@ -76,7 +55,7 @@ export default async function AdminSidebar() {
         } satisfies AdminSidebarItem,
       ],
     },
-    { label: 'Tools', items: tools },
+    { label: 'Tools', items: Object.values(tools) },
     { label: 'Maps', items: maps },
   ]
 

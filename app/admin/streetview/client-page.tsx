@@ -8,6 +8,7 @@ import {
   PageHeader,
   PageHeaderActions,
   PageHeaderContent,
+  PageHeaderDescription,
   PageHeaderTitle,
 } from '@/components/page/page-header'
 import { StreetviewPanorama } from '../components/streetview-panorama'
@@ -21,6 +22,7 @@ import { Coordinate } from 'ol/coordinate'
 import { StreetviewSegmentation } from '../components/streetview-segmentation'
 import { Button } from '@/components/ui/button'
 import { RefreshCcwIcon } from 'lucide-react'
+import { tools } from '../data/admin-sidebar'
 
 export function StreetviewClientPage({
   map,
@@ -78,6 +80,9 @@ export function StreetviewClientPage({
       <PageHeader>
         <PageHeaderContent>
           <PageHeaderTitle>Streetview</PageHeaderTitle>
+          <PageHeaderDescription>
+            {tools.streetview.description}
+          </PageHeaderDescription>
         </PageHeaderContent>
 
         <PageHeaderActions>

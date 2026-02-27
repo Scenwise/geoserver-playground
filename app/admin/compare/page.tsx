@@ -12,6 +12,7 @@ import { CompareMaps } from '../components/compare-maps'
 import { geoserverMaps } from '@/lib/db/schema'
 import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm'
+import { tools } from '../data/admin-sidebar'
 
 export default async function ComparePage({
   searchParams,
@@ -37,7 +38,7 @@ export default async function ComparePage({
         <PageHeaderContent>
           <PageHeaderTitle>Compare maps</PageHeaderTitle>
           <PageHeaderDescription>
-            Compare two map versions side by side.
+            {tools.compare.description}
           </PageHeaderDescription>
         </PageHeaderContent>
 

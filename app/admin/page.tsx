@@ -17,6 +17,7 @@ import { ChevronsLeftRightIcon, ViewIcon } from 'lucide-react'
 import Link from 'next/link'
 import { GeoserverMapItem } from './components/geoserver-map-item'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { tools } from './data/admin-sidebar'
 
 export default async function Home() {
   const dbMaps = await db
@@ -50,37 +51,26 @@ export default async function Home() {
           </CardHeader>
 
           <CardContent className="grid grid-cols-2 auto-rows-fr gap-4">
-            <Item asChild variant="outline" className="p-4 bg-card">
-              <Link href="/admin/compare">
-                <ItemHeader>
-                  <ChevronsLeftRightIcon className="size-10 m-1 mb-3" />
-                </ItemHeader>
-                <ItemContent>
-                  <ItemTitle className="text-base font-semibold">
-                    Compare Maps
-                  </ItemTitle>
-                  <ItemDescription>
-                    Compare two map versions side by side
-                  </ItemDescription>
-                </ItemContent>
-              </Link>
-            </Item>
-
-            <Item asChild variant="outline" className="p-4 bg-card">
-              <Link href="/admin/streetview">
-                <ItemHeader>
-                  <ViewIcon className="size-10 m-1 mb-3" />
-                </ItemHeader>
-                <ItemContent>
-                  <ItemTitle className="text-base font-semibold">
-                    Streetview
-                  </ItemTitle>
-                  <ItemDescription>
-                    View street-level imagery for a location
-                  </ItemDescription>
-                </ItemContent>
-              </Link>
-            </Item>
+            {Object.values(tools).map((tool) => (
+              <Item
+                key={tool.href}
+                asChild
+                variant="outline"
+                className="p-4 bg-card"
+              >
+                <Link href={tool.href ?? '#'}>
+                  <ItemHeader>
+                    <tool.icon className="size-10 m-1 mb-3" />
+                  </ItemHeader>
+                  <ItemContent>
+                    <ItemTitle className="text-base font-semibold">
+                      {tool.title}
+                    </ItemTitle>
+                    <ItemDescription>{tool.description}</ItemDescription>
+                  </ItemContent>
+                </Link>
+              </Item>
+            ))}
           </CardContent>
         </Card>
       </PageContent>
