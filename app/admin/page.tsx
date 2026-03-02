@@ -14,7 +14,7 @@ import {
   ItemTitle,
 } from '@/components/ui/item'
 import { db } from '@/lib/db'
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import Link from 'next/link'
 import { GeoserverMapItem } from './components/geoserver-map-item'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

@@ -7,7 +7,7 @@ import {
   ItemDescription,
   ItemActions,
 } from '@/components/ui/item'
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { MapIcon, ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 

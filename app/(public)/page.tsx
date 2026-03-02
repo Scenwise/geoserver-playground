@@ -1,7 +1,7 @@
 import { OpenLayersMap } from '@/components/openlayers-map'
 import { Item, ItemFooter } from '@/components/ui/item'
 import { db } from '@/lib/db'
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { eq } from 'drizzle-orm'
 
 export default async function Home() {

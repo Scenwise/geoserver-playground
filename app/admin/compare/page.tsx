@@ -9,7 +9,7 @@ import {
 } from '@/components/page/page-header'
 import { CompareMapSwap } from '../components/compare-map-swap'
 import { CompareMaps } from '../components/compare-maps'
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { tools } from '../data/admin-sidebar'

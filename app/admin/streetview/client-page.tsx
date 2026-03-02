@@ -1,6 +1,6 @@
 'use client'
 
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 
 import { OpenLayersMap, MapContainer } from '@/components/openlayers-map'
 import { PageContainer, PageContent } from '@/components/page/page-container'

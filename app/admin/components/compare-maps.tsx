@@ -1,7 +1,7 @@
 'use client'
 
 import { ResizablePanelGroup, ResizableHandle } from '@/components/ui/resizable'
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { CompareMap } from './compare-map'
 import { useState } from 'react'
 import { State } from 'ol/View'

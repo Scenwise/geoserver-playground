@@ -1,6 +1,6 @@
 import { MapContainer, OpenLayersMap } from '@/components/openlayers-map'
 import { ResizablePanel } from '@/components/ui/resizable'
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { useEffect, useRef } from 'react'
 
 import { Map } from 'ol'

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { createInsertSchema } from 'drizzle-orm/zod'
 import { Controller, useForm } from 'react-hook-form'
 import {

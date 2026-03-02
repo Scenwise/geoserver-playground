@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { db } from '@/lib/db'
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { ArrowLeft, Gauge, Map, StarIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ColoredBadge } from '@/components/colored-badge'

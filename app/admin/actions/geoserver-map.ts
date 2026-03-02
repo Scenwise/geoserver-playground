@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { geoserverMaps } from '@/lib/db/schema'
+import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { eq } from 'drizzle-orm'
 import { createInsertSchema, createUpdateSchema } from 'drizzle-orm/zod'
 import z from 'zod'
