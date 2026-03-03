@@ -1,9 +1,4 @@
-import {
-  ChevronsLeftRightIcon,
-  Icon,
-  LucideProps,
-  ViewIcon,
-} from 'lucide-react'
+import { ChevronsLeftRightIcon, LucideProps, ViewIcon } from 'lucide-react'
 import { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 type IconComponent = ForwardRefExoticComponent<

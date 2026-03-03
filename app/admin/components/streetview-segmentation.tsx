@@ -1,11 +1,9 @@
 import { ColoredBadge } from '@/components/colored-badge'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { BrainCogIcon, ImageDownIcon } from 'lucide-react'
+import { BrainCogIcon } from 'lucide-react'
 import { Coordinate } from 'ol/coordinate'
 
 export function StreetviewSegmentation({
-  position,
   className = '',
 }: {
   position?: Coordinate

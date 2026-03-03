@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, Ref, useCallback } from 'react'
 
 import 'ol/ol.css'
 import { Map, View } from 'ol'
@@ -19,19 +19,20 @@ import { cn } from '@/lib/utils'
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
 interface OpenLayersProps {
-  mapRef?: React.RefObject<Map | null>
+  ref?: Ref<Map>
   initialView?: Partial<State>
   edgeLayerId?: string
   nodeLayerId?: string
 }
 
 export function OpenLayersMap({
-  mapRef = useRef<Map>(null),
+  ref,
   initialView,
   edgeLayerId,
   nodeLayerId,
 }: OpenLayersProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<Map | null>(null)
 
   const [view] = useState<Partial<State>>(
     () =>
@@ -43,11 +44,8 @@ export function OpenLayersMap({
 
   const { styleUrl, isSatellite, setIsSatellite } = useMapStyle(mapRef)
 
-  // Initialize the map on component mount
-  useEffect(() => {
-    if (!mapContainerRef.current) return
-
-    const map = new Map({
+  const createMap = useCallback(() => {
+    return new Map({
       target: mapContainerRef.current!,
       layers: [
         new MapboxVectorLayer({
@@ -77,11 +75,31 @@ export function OpenLayersMap({
       }),
       controls: [],
     })
+  }, [edgeLayerId, nodeLayerId, styleUrl, view])
 
+  // Initialize the map on component mount
+  useEffect(() => {
+    if (!mapContainerRef.current) return
+
+    const map = createMap()
     mapRef.current = map
 
-    return () => map.setTarget(undefined)
-  }, [])
+    if (typeof ref === 'function') {
+      ref(map)
+    } else if (ref) {
+      ref.current = map
+    }
+
+    return () => {
+      map.setTarget(undefined)
+
+      if (typeof ref === 'function') {
+        ref(null)
+      } else if (ref) {
+        ref.current = null
+      }
+    }
+  }, [createMap, ref])
 
   function zoom(value: number) {
     if (!mapRef.current) return

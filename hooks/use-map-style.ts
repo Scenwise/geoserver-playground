@@ -1,7 +1,7 @@
 import { useTheme } from 'next-themes'
 import { Map } from 'ol'
 import LayerGroup from 'ol/layer/Group'
-import { useEffect, useMemo, useState } from 'react'
+import { RefObject, useEffect, useMemo, useState } from 'react'
 import apply from 'ol-mapbox-style'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
@@ -15,7 +15,7 @@ const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
  * @returns styleUrl - The URL of the current map style being used.
  * @returns setIsSatellite - A function to toggle satellite mode on or off.
  */
-export function useMapStyle(mapRef: React.RefObject<Map | null>) {
+export function useMapStyle(mapRef: RefObject<Map | null>) {
   const { resolvedTheme } = useTheme()
   const [isSatellite, setIsSatellite] = useState(false)
 
@@ -28,7 +28,7 @@ export function useMapStyle(mapRef: React.RefObject<Map | null>) {
 
   // Change the base layer to trigger a style update when the theme changes
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!mapRef?.current) return
 
     const layers = mapRef.current.getLayers()
     layers.removeAt(0)
@@ -37,7 +37,7 @@ export function useMapStyle(mapRef: React.RefObject<Map | null>) {
     apply(layerGroup, styleUrl, { accessToken })
 
     layers.insertAt(0, layerGroup)
-  }, [styleUrl])
+  }, [mapRef, styleUrl])
 
   return { styleUrl, isSatellite, setIsSatellite }
 }

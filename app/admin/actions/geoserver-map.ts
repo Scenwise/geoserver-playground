@@ -40,9 +40,10 @@ export const getMainGeoserverMap = cache(async () => {
   await verifySession()
 
   try {
-    return await db.query.geoserverMaps.findFirst({
+    const data = await db.query.geoserverMaps.findFirst({
       where: { isMain: true },
     })
+    return data ?? null
   } catch (error) {
     console.error('Error fetching main GeoServer map:', error)
     return null
@@ -53,9 +54,9 @@ export type UpsertGeoserverMap =
   | typeof geoserverMaps.$inferSelect
   | typeof geoserverMaps.$inferInsert
 
-const geogerverMapInsertSchema = createInsertSchema(geoserverMaps)
+const _geoserverMapInsertSchema = createInsertSchema(geoserverMaps)
 export const insertGeoServerMap = async (
-  data: z.infer<typeof geogerverMapInsertSchema>,
+  data: z.infer<typeof _geoserverMapInsertSchema>,
 ) => {
   await verifySession()
 
@@ -64,10 +65,10 @@ export const insertGeoServerMap = async (
   refresh()
 }
 
-const geoserverMapUpdateSchema = createUpdateSchema(geoserverMaps)
+const _geoserverMapUpdateSchema = createUpdateSchema(geoserverMaps)
 export const updateGeoServerMap = async (
   id: number,
-  data: z.infer<typeof geoserverMapUpdateSchema>,
+  data: z.infer<typeof _geoserverMapUpdateSchema>,
 ) => {
   await verifySession()
 

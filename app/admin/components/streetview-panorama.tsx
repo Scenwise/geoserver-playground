@@ -12,55 +12,57 @@ export function StreetviewPanorama({
   className = '',
 }: {
   position?: Coordinate
-  onPositionChange?: (position: Coordinate) => void
+  onPositionChange: (position: Coordinate) => void
   className?: string
 }) {
   const containerRef = useRef(null)
   const panoramaRef = useRef<google.maps.StreetViewPanorama>(null)
 
+  function createPanorama(targetPosition: google.maps.LatLng) {
+    if (!containerRef.current || !window.google) return
+
+    return new window.google.maps.StreetViewPanorama(containerRef.current!, {
+      position: targetPosition,
+      pov: { heading: 0, pitch: 0 },
+      zoom: 1,
+      fullscreenControl: false,
+      addressControl: false,
+      linksControl: false,
+      zoomControl: false,
+      panControl: false,
+      imageDateControl: false,
+    })
+  }
+
+  // Initialize Street View panorama when position is set
   useEffect(() => {
-    if (!containerRef.current || !window.google || !position) return
+    if (panoramaRef.current || !position) return
 
-    const transformed = coordinateToLatLng(position)
-    if (panoramaRef.current) {
-      updatePanoramaPosition(transformed)
-    } else {
-      initializePanorama(transformed)
-    }
-  }, [position])
+    const targetPosition = coordinateToLatLng(position)
+    const panorama = createPanorama(targetPosition)
 
-  function initializePanorama(position: google.maps.LatLng) {
-    const panorama = new window.google.maps.StreetViewPanorama(
-      containerRef.current!,
-      {
-        position,
-        pov: { heading: 0, pitch: 0 },
-        zoom: 1,
-        fullscreenControl: false,
-        addressControl: false,
-        linksControl: false,
-        zoomControl: false,
-        panControl: false,
-        imageDateControl: false,
-      },
-    )
+    if (!panorama) return
 
     panorama.addListener('position_changed', () => {
       const newPos = panorama.getPosition()
-      if (newPos) onPositionChange?.(latLngToCoordinate(newPos))
+      if (newPos) onPositionChange(latLngToCoordinate(newPos))
     })
 
     panoramaRef.current = panorama
-  }
+  }, [onPositionChange, position])
 
-  function updatePanoramaPosition(position: google.maps.LatLng) {
-    const panorama = panoramaRef.current!
+  // Update panorama position when prop changes
+  useEffect(() => {
+    const panorama = panoramaRef.current
+    if (!panorama || !position) return
+
+    const targetPosition = coordinateToLatLng(position)
     const currentPosition = panorama.getPosition()
 
-    if (!currentPosition?.equals(position)) {
-      panorama.setPosition(position)
+    if (!currentPosition?.equals(targetPosition)) {
+      panorama.setPosition(targetPosition)
     }
-  }
+  }, [position])
 
   return (
     <div

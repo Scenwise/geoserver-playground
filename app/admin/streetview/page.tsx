@@ -1,11 +1,11 @@
 import Script from 'next/script'
-import { getMainGeoServerMap } from '../actions/geoserver-map'
 import { StreetviewClientPage } from './client-page'
+import { getMainGeoserverMap } from '../actions/geoserver-map'
+
+const API_KEY = process.env.NEXT_GOOGLE_MAPS_API_KEY
 
 export default async function StreetviewPage() {
-  const mainMap = await getMainGeoServerMap()
-
-  const API_KEY = process.env.NEXT_GOOGLE_MAPS_API_KEY
+  const mainMap = await getMainGeoserverMap()
 
   return (
     <>

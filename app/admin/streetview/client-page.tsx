@@ -27,7 +27,7 @@ import { tools } from '../data/admin-sidebar'
 export function StreetviewClientPage({
   map,
 }: {
-  map?: typeof geoserverMaps.$inferSelect
+  map: typeof geoserverMaps.$inferSelect | null
 }) {
   const [swappedLayout, setSwappedLayout] = useState(false)
 
@@ -35,16 +35,6 @@ export function StreetviewClientPage({
 
   const mapRef = useRef<Map | null>(null)
   const clickSource = useRef<VectorSource>(new VectorSource())
-
-  useEffect(() => {
-    if (!mapRef.current) return
-
-    initializeStreetViewLayer()
-
-    mapRef.current.on('click', (evt) => {
-      updatePosition(evt.coordinate)
-    })
-  }, [mapRef])
 
   function initializeStreetViewLayer() {
     const clickLayer = new VectorLayer({
@@ -74,6 +64,16 @@ export function StreetviewClientPage({
       duration: 100,
     })
   }
+
+  useEffect(() => {
+    if (!mapRef.current) return
+
+    initializeStreetViewLayer()
+
+    mapRef.current.on('click', (evt) => {
+      updatePosition(evt.coordinate)
+    })
+  }, [mapRef])
 
   return (
     <PageContainer className="max-h-screen">
