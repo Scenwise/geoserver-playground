@@ -69,7 +69,7 @@ export function CompareMap({
           key={`map-${map?.id}`}
           edgeLayerId={map?.geoserverEdges}
           nodeLayerId={map?.geoserverNodes}
-          mapRef={mapRef}
+          ref={mapRef}
         />
       </MapContainer>
     </ResizablePanel>

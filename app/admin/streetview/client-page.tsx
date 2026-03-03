@@ -11,7 +11,7 @@ import {
   PageHeaderDescription,
   PageHeaderTitle,
 } from '@/components/page/page-header'
-import { StreetviewPanorama } from '../components/streetview-panorama'
+import { StreetviewPanorama } from '@/admin/components/streetview-panorama'
 import { useEffect, useRef, useState } from 'react'
 import { Feature, Map } from 'ol'
 import VectorSource from 'ol/source/Vector'
@@ -19,10 +19,10 @@ import VectorLayer from 'ol/layer/Vector'
 import { Icon, Style } from 'ol/style'
 import { Point } from 'ol/geom'
 import { Coordinate } from 'ol/coordinate'
-import { StreetviewSegmentation } from '../components/streetview-segmentation'
+import { StreetviewSegmentation } from '@/admin/components/streetview-segmentation'
 import { Button } from '@/components/ui/button'
 import { RefreshCcwIcon } from 'lucide-react'
-import { tools } from '../data/admin-sidebar'
+import { tools } from '@/admin/data/admin-sidebar'
 
 export function StreetviewClientPage({
   map,
@@ -102,7 +102,7 @@ export function StreetviewClientPage({
           }
         >
           <OpenLayersMap
-            mapRef={mapRef}
+            ref={mapRef}
             nodeLayerId={map?.geoserverNodes}
             edgeLayerId={map?.geoserverEdges}
           />
