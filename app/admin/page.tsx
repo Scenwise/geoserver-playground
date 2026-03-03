@@ -13,18 +13,14 @@ import {
   ItemHeader,
   ItemTitle,
 } from '@/components/ui/item'
-import { db } from '@/lib/db'
-import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import Link from 'next/link'
 import { GeoserverMapItem } from './components/geoserver-map-item'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { tools } from './data/admin-sidebar'
+import { getGeoserverMaps } from './actions/geoserver-map'
 
 export default async function Home() {
-  const dbMaps = await db
-    .select()
-    .from(geoserverMaps)
-    .orderBy(geoserverMaps.name)
+  const geoserverMaps = await getGeoserverMaps()
 
   return (
     <PageContainer>
@@ -40,7 +36,7 @@ export default async function Home() {
             <CardTitle>Maps</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {dbMaps.map((map) => (
+            {geoserverMaps.map((map) => (
               <GeoserverMapItem key={map.id} map={map} />
             ))}
           </CardContent>

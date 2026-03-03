@@ -15,25 +15,21 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { db } from '@/lib/db'
-import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { ArrowLeft, Gauge, Map, StarIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ColoredBadge } from '@/components/colored-badge'
-import { ModeToggle } from '@/components/mode-toggle'
 import {
   AdminSidebarGroup,
   AdminSidebarItem,
   tools,
 } from '../data/admin-sidebar'
+import { AdminSidebarUser } from './admin-sidebar-user'
+import { getGeoserverMaps } from '../actions/geoserver-map'
 
 export default async function AdminSidebar() {
-  const dbMaps = await db
-    .select()
-    .from(geoserverMaps)
-    .orderBy(geoserverMaps.name)
+  const geoserverMaps = await getGeoserverMaps()
 
-  const maps: AdminSidebarItem[] = dbMaps.map((map) => ({
+  const maps: AdminSidebarItem[] = geoserverMaps.map((map) => ({
     title: map.name,
     icon: Map,
     href: `/admin/maps/${map.id}`,
@@ -124,13 +120,7 @@ export default async function AdminSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
 
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <ModeToggle />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <AdminSidebarUser />
       </SidebarFooter>
     </Sidebar>
   )

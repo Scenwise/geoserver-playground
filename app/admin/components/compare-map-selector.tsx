@@ -1,22 +1,22 @@
 'use server'
 
-import { db } from '@/lib/db'
 import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { CompareMapDropdown } from './compare-map-dropdown'
 import { GeoserverMapItem } from './geoserver-map-item'
+import { getGeoserverMaps } from '../actions/geoserver-map'
 
 export async function CompareMapSelector({
   map,
   paramKey,
 }: {
-  map?: typeof geoserverMaps.$inferSelect
+  map: typeof geoserverMaps.$inferSelect | null
   paramKey: string
 }) {
-  const maps = await db.select().from(geoserverMaps).orderBy(geoserverMaps.name)
+  const geoserverMaps = await getGeoserverMaps()
 
   return (
     <div className="grow flex flex-col items-stretch gap-2">
-      <CompareMapDropdown map={map} maps={maps} paramKey={paramKey} />
+      <CompareMapDropdown map={map} maps={geoserverMaps} paramKey={paramKey} />
 
       {map && <GeoserverMapItem map={map} />}
     </div>

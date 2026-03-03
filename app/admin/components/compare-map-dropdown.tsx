@@ -23,7 +23,7 @@ export function CompareMapDropdown({
   maps,
   paramKey,
 }: {
-  map?: Map
+  map: Map | null
   maps: Map[]
   paramKey: string
 }) {

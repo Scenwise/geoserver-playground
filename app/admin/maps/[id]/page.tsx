@@ -1,10 +1,7 @@
 'use server'
 
 import { OpenLayersMap, MapContainer } from '@/components/openlayers-map'
-import { db } from '@/lib/db'
-import { eq } from 'drizzle-orm'
 import { GeoserverMapForm } from '../../components/goeserver-map-form'
-import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { FeatureCountBadge } from '../../components/feature-count-badge'
 import { Button } from '@/components/ui/button'
 import { GeoserverMapMainButton } from '../../components/geoserver-map-main-button'
@@ -24,6 +21,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { getGeoserverMapById } from '../../actions/geoserver-map'
+import { notFound } from 'next/navigation'
 
 export default async function MapPage({
   params,
@@ -31,20 +30,18 @@ export default async function MapPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const geoserverMap = await getGeoserverMapById(parseInt(id))
 
-  const [map] = await db
-    .select()
-    .from(geoserverMaps)
-    .where(eq(geoserverMaps.id, Number(id)))
+  if (!geoserverMap) notFound()
 
   return (
     <PageContainer>
       <PageHeader>
         <PageHeaderContent>
           <div className="flex items-center gap-2">
-            <PageHeaderTitle>{map?.name}</PageHeaderTitle>
+            <PageHeaderTitle>{geoserverMap?.name}</PageHeaderTitle>
 
-            {map.isMain && (
+            {geoserverMap?.isMain && (
               <Tooltip>
                 <TooltipTrigger>
                   <ColoredBadge className="bg-purple-100 text-purple-700  dark:bg-purple-900 dark:text-purple-300  ">
@@ -60,21 +57,25 @@ export default async function MapPage({
             )}
           </div>
 
-          {map?.description && (
-            <PageHeaderDescription>{map.description}</PageHeaderDescription>
+          {geoserverMap?.description && (
+            <PageHeaderDescription>
+              {geoserverMap.description}
+            </PageHeaderDescription>
           )}
         </PageHeaderContent>
 
         <PageHeaderActions>
-          <GeoserverMapMainButton map={{ id: map?.id, isMain: map?.isMain }} />
-          <GeoserverMapForm data={map}>
+          <GeoserverMapMainButton
+            map={{ id: geoserverMap?.id, isMain: geoserverMap?.isMain }}
+          />
+          <GeoserverMapForm data={geoserverMap}>
             <Button variant="secondary">
               <PenIcon />
               Edit
             </Button>
           </GeoserverMapForm>
           <Button asChild variant="secondary">
-            <Link href={`/admin/compare?map1=${map?.id}`}>
+            <Link href={`/admin/compare?map1=${geoserverMap?.id}`}>
               <ChevronsLeftRightIcon />
               Compare
             </Link>
@@ -83,15 +84,21 @@ export default async function MapPage({
       </PageHeader>
 
       <PageContent className="flex gap-4">
-        <FeatureCountBadge id={map?.geoserverNodes || ''} type="nodes" />
-        <FeatureCountBadge id={map?.geoserverEdges || ''} type="edges" />
+        <FeatureCountBadge
+          id={geoserverMap?.geoserverNodes || ''}
+          type="nodes"
+        />
+        <FeatureCountBadge
+          id={geoserverMap?.geoserverEdges || ''}
+          type="edges"
+        />
       </PageContent>
 
       <PageContent className="grow flex">
         <MapContainer>
           <OpenLayersMap
-            edgeLayerId={map.geoserverEdges}
-            nodeLayerId={map.geoserverNodes}
+            edgeLayerId={geoserverMap.geoserverEdges}
+            nodeLayerId={geoserverMap.geoserverNodes}
           />
         </MapContainer>
       </PageContent>

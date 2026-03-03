@@ -9,10 +9,8 @@ import {
 } from '@/components/page/page-header'
 import { CompareMapSwap } from '../components/compare-map-swap'
 import { CompareMaps } from '../components/compare-maps'
-import { geoserverMaps } from '@/lib/db/schema/geoserver'
-import { db } from '@/lib/db'
-import { eq } from 'drizzle-orm'
 import { tools } from '../data/admin-sidebar'
+import { getGeoserverMapById } from '../actions/geoserver-map'
 
 export default async function ComparePage({
   searchParams,
@@ -22,13 +20,7 @@ export default async function ComparePage({
   const { map1, map2 } = await searchParams
 
   const getMap = (id?: string) =>
-    id
-      ? db
-          .select()
-          .from(geoserverMaps)
-          .where(eq(geoserverMaps.id, parseInt(id)))
-          .then((maps) => maps[0])
-      : undefined
+    id ? getGeoserverMapById(parseInt(id)) : null
 
   const [map1Data, map2Data] = await Promise.all([getMap(map1), getMap(map2)])
 

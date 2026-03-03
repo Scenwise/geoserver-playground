@@ -11,7 +11,7 @@ export function CompareMap({
   view,
   onViewChange,
 }: {
-  map?: typeof geoserverMaps.$inferSelect
+  map: typeof geoserverMaps.$inferSelect | null
   view?: Partial<State>
   onViewChange?: (view: State) => void
 }) {

@@ -1,3 +1,4 @@
+import { defineRelations } from 'drizzle-orm'
 import { boolean, integer, pgTable, varchar } from 'drizzle-orm/pg-core'
 
 export const geoserverMaps = pgTable('geoserver_maps', {
@@ -9,3 +10,5 @@ export const geoserverMaps = pgTable('geoserver_maps', {
   isMain: boolean().unique(),
   description: varchar({ length: 255 }),
 })
+
+export const geoserverRelations = defineRelations({ geoserverMaps }, () => ({}))

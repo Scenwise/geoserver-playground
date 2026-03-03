@@ -10,8 +10,8 @@ export function CompareMaps({
   map1,
   map2,
 }: {
-  map1?: typeof geoserverMaps.$inferSelect
-  map2?: typeof geoserverMaps.$inferSelect
+  map1: typeof geoserverMaps.$inferSelect | null
+  map2: typeof geoserverMaps.$inferSelect | null
 }) {
   const [view, setView] = useState<Partial<State>>({
     center: [497598, 6785131],
