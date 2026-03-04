@@ -39,23 +39,25 @@ export function StreetviewClientPage({
   function initializeStreetViewLayer() {
     const clickLayer = new VectorLayer({
       source: clickSource.current,
-      style: new Style({
-        image: new Icon({
-          anchor: [0.5, 1],
-          src: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
+      style: (feature) =>
+        new Style({
+          image: new Icon({
+            anchor: [0.5, 0.5],
+            scale: 0.5,
+            src: '/streetview-indicator.png',
+            rotation: (feature.get('heading') * Math.PI) / 180,
+          }),
         }),
-      }),
     })
 
     mapRef.current!.addLayer(clickLayer)
   }
 
-  function updatePosition(position: Coordinate) {
+  function updatePosition(position: Coordinate, heading = 0) {
     setPosition(position)
 
     clickSource.current.clear()
-
-    const feature = new Feature({ geometry: new Point(position) })
+    const feature = new Feature({ geometry: new Point(position), heading })
     clickSource.current.addFeature(feature)
 
     // Keep the map centered on the new position

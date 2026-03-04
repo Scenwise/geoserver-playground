@@ -12,7 +12,7 @@ export function StreetviewPanorama({
   className = '',
 }: {
   position?: Coordinate
-  onPositionChange: (position: Coordinate) => void
+  onPositionChange: (position: Coordinate, heading: number) => void
   className?: string
 }) {
   const containerRef = useRef(null)
@@ -43,10 +43,15 @@ export function StreetviewPanorama({
 
     if (!panorama) return
 
-    panorama.addListener('position_changed', () => {
-      const newPos = panorama.getPosition()
-      if (newPos) onPositionChange(latLngToCoordinate(newPos))
-    })
+    const updatePanoramaPosition = () => {
+      const position = panorama.getPosition()
+      const pov = panorama.getPov()
+      if (!position || !pov) return
+      onPositionChange(latLngToCoordinate(position), pov.heading)
+    }
+
+    panorama.addListener('position_changed', updatePanoramaPosition)
+    panorama.addListener('pov_changed', updatePanoramaPosition)
 
     panoramaRef.current = panorama
   }, [onPositionChange, position])
