@@ -5,6 +5,11 @@ import {
   ItemMedia,
   ItemTitle,
 } from '@/components/ui/item'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { safeJson } from '@/lib/safe-json'
 import { GitCommitIcon, SplineIcon, TriangleAlertIcon } from 'lucide-react'
 
@@ -30,7 +35,14 @@ export async function FeatureCountBadge({
   return (
     <Item variant="outline">
       <ItemMedia variant="icon">
-        <BadgeIcon />
+        <Tooltip>
+          <TooltipTrigger>
+            <BadgeIcon />
+          </TooltipTrigger>
+          <TooltipContent>
+            <pre>{JSON.stringify(json, null, 2)}</pre>
+          </TooltipContent>
+        </Tooltip>
       </ItemMedia>
       <ItemContent>
         <ItemTitle className="capitalize">{type}</ItemTitle>

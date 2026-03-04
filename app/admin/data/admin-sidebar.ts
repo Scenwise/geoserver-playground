@@ -1,4 +1,9 @@
-import { ChevronsLeftRightIcon, LucideProps, ViewIcon } from 'lucide-react'
+import {
+  BusIcon,
+  ChevronsLeftRightIcon,
+  LucideProps,
+  ViewIcon,
+} from 'lucide-react'
 import { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 type IconComponent = ForwardRefExoticComponent<
@@ -31,5 +36,11 @@ export const tools: Record<string, AdminSidebarItem> = {
     icon: ViewIcon,
     href: '/admin/streetview',
     description: 'View location street-level imagery and segmentation.',
+  },
+  ov: {
+    title: 'OV',
+    icon: BusIcon,
+    href: '/admin/ov',
+    description: 'View public transport data and network structure.',
   },
 }

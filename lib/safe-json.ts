@@ -10,6 +10,6 @@ export async function safeJson(response: Response) {
     const json = await response.json()
     return { json, error: null }
   } catch (error) {
-    return { json: null, error }
+    return { json: null, error: error as Error }
   }
 }
