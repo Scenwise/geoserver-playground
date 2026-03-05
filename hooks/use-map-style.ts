@@ -3,8 +3,18 @@ import { Map } from 'ol'
 import LayerGroup from 'ol/layer/Group'
 import { RefObject, useEffect, useMemo, useState } from 'react'
 import apply from 'ol-mapbox-style'
+import { IconComponent } from '@/lib/types'
+import { MapPinIcon, PaletteIcon, SatelliteIcon, CarIcon } from 'lucide-react'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+
+export const MAP_STYLES = {
+  basic: { label: 'Basic', icon: PaletteIcon },
+  streets: { label: 'Streets', icon: CarIcon },
+  satellite: { label: 'Satellite', icon: SatelliteIcon },
+}
+
+export type MapStyle = keyof typeof MAP_STYLES
 
 /**
  * Custom hook to manage the map style based on the current theme and satellite mode.
@@ -13,18 +23,22 @@ const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
  * @param mapRef - A ref to the OpenLayers Map instance that needs to be updated when the style changes.
  *
  * @returns styleUrl - The URL of the current map style being used.
- * @returns setIsSatellite - A function to toggle satellite mode on or off.
+ * @returns style - The current map style ('basic', 'streets', or 'satellite').
+ * @returns setStyle - A function to update the map style.
  */
 export function useMapStyle(mapRef: RefObject<Map | null>) {
   const { resolvedTheme } = useTheme()
-  const [isSatellite, setIsSatellite] = useState(false)
+  const [style, setStyle] = useState<MapStyle>('satellite')
 
   const styleUrl = useMemo(() => {
-    if (isSatellite) return 'mapbox://styles/mapbox/satellite-v9'
+    if (style === 'streets') return 'mapbox://styles/mapbox/streets-v12'
+    if (style === 'satellite') return 'mapbox://styles/mapbox/satellite-v9'
+
+    // Else, return the basic style based on the theme
     return resolvedTheme === 'dark'
       ? 'mapbox://styles/mapbox/dark-v11'
       : 'mapbox://styles/mapbox/light-v11'
-  }, [resolvedTheme, isSatellite])
+  }, [resolvedTheme, style])
 
   // Change the base layer to trigger a style update when the theme changes
   useEffect(() => {
@@ -39,5 +53,5 @@ export function useMapStyle(mapRef: RefObject<Map | null>) {
     layers.insertAt(0, layerGroup)
   }, [mapRef, styleUrl])
 
-  return { styleUrl, isSatellite, setIsSatellite }
+  return { styleUrl, style, setStyle }
 }

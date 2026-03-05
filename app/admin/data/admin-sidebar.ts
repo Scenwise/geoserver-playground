@@ -1,14 +1,5 @@
-import {
-  BusIcon,
-  ChevronsLeftRightIcon,
-  LucideProps,
-  ViewIcon,
-} from 'lucide-react'
-import { ForwardRefExoticComponent, RefAttributes } from 'react'
-
-type IconComponent = ForwardRefExoticComponent<
-  Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>
->
+import { IconComponent } from '@/lib/types'
+import { BusIcon, ChevronsLeftRightIcon, ViewIcon } from 'lucide-react'
 
 export type AdminSidebarItem = {
   title: string

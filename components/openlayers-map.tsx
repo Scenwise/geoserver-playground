@@ -9,9 +9,9 @@ import TileLayer from 'ol/layer/Tile'
 import { TileWMS } from 'ol/source'
 import { MapboxVectorLayer } from 'ol-mapbox-style'
 import { State } from 'ol/View'
-import { useMapStyle } from '@/hooks/use-map-style'
+import { MAP_STYLES, MapStyle, useMapStyle } from '@/hooks/use-map-style'
 import { Button } from './ui/button'
-import { Minus, PaletteIcon, Plus, SatelliteIcon } from 'lucide-react'
+import { MinusIcon, PaletteIcon, PlusIcon, SatelliteIcon } from 'lucide-react'
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group'
 import { ButtonGroup } from './ui/button-group'
 import { cn } from '@/lib/utils'
@@ -42,7 +42,11 @@ export function OpenLayersMap({
       },
   )
 
-  const { styleUrl, isSatellite, setIsSatellite } = useMapStyle(mapRef)
+  const { styleUrl, style, setStyle } = useMapStyle(mapRef)
+
+  useEffect(() => {
+    console.log(styleUrl)
+  }, [styleUrl])
 
   const createMap = useCallback(() => {
     return new Map({
@@ -117,10 +121,10 @@ export function OpenLayersMap({
         className="self-start place-self-end mt-3 mr-3 ring-2 ring-background bg-background rounded-lg shadow"
       >
         <Button onClick={() => zoom(1)} variant="outline" size="icon">
-          <Plus />
+          <PlusIcon />
         </Button>
         <Button onClick={() => zoom(-1)} variant="outline" size="icon">
-          <Minus />
+          <MinusIcon />
         </Button>
       </ButtonGroup>
 
@@ -128,16 +132,17 @@ export function OpenLayersMap({
         type="single"
         variant="outline"
         className="bg-background self-end place-self-end z-10 mb-3 mr-3 ring-2 ring-background shadow"
-        value={isSatellite ? 'satellite' : 'default'}
+        value={style}
+        onValueChange={(value: string | null) =>
+          value && setStyle(value as MapStyle)
+        }
       >
-        <ToggleGroupItem value="default" onClick={() => setIsSatellite(false)}>
-          <PaletteIcon />
-          Basic
-        </ToggleGroupItem>
-        <ToggleGroupItem value="satellite" onClick={() => setIsSatellite(true)}>
-          <SatelliteIcon />
-          Satellite
-        </ToggleGroupItem>
+        {Object.entries(MAP_STYLES).map(([key, { label, icon: Icon }]) => (
+          <ToggleGroupItem key={key} value={key}>
+            <Icon />
+            {label}
+          </ToggleGroupItem>
+        ))}
       </ToggleGroup>
     </div>
   )
