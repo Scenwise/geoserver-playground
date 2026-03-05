@@ -45,8 +45,8 @@ export function OpenLayersMap({
   )
 
   const vectorLayerRef = useRef<MapboxVectorLayer | null>(null)
-  const [style, setStyle] = useState<MapStyle>('basic')
-  const { styleUrl } = useMapStyle(mapRef, style)
+
+  const { styleUrl } = useMapStyle()
 
   const createMap = useCallback(() => {
     const vectorLayer = new MapboxVectorLayer({
@@ -119,8 +119,7 @@ export function OpenLayersMap({
 
       <OpenLayersMapStyle
         className="self-end place-self-end mb-3 mr-3"
-        style={style}
-        onStyleChange={setStyle}
+        mapRef={mapRef}
       />
     </div>
   )
