@@ -56,21 +56,9 @@ export function StreetviewClientPage({
   function updatePosition(position: Coordinate, heading = 0) {
     setPosition(position)
 
-    const positionFeature = clickSource.current.getFeatureById('position')
-
-    console.log(positionFeature)
-
-    if (!positionFeature) {
-      const feature = new Feature({
-        id: 'position',
-        geometry: new Point(position),
-        heading,
-      })
-      clickSource.current.addFeature(feature)
-    } else {
-      positionFeature.setGeometry(new Point(position))
-      positionFeature.set('heading', heading)
-    }
+    clickSource.current.clear()
+    const feature = new Feature({ geometry: new Point(position), heading })
+    clickSource.current.addFeature(feature)
 
     // Keep the map centered on the new position
     mapRef.current!.getView().animate({

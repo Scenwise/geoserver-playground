@@ -7,7 +7,7 @@ import { Map, View } from 'ol'
 import { type MapOptions } from 'ol/Map'
 import TileLayer from 'ol/layer/Tile'
 import { TileWMS } from 'ol/source'
-import { MapboxVectorLayer } from 'ol-mapbox-style'
+import { applyStyle, MapboxVectorLayer } from 'ol-mapbox-style'
 import { State } from 'ol/View'
 import { MAP_STYLES, MapStyle, useMapStyle } from '@/hooks/use-map-style'
 import { Button } from './ui/button'
@@ -44,17 +44,21 @@ export function OpenLayersMap({
       },
   )
 
+  const vectorLayerRef = useRef<MapboxVectorLayer | null>(null)
   const [style, setStyle] = useState<MapStyle>('basic')
   const { styleUrl } = useMapStyle(mapRef, style)
 
   const createMap = useCallback(() => {
+    const vectorLayer = new MapboxVectorLayer({
+      styleUrl,
+      accessToken,
+    })
+    vectorLayerRef.current = vectorLayer
+
     return new Map({
       target: mapContainerRef.current!,
       layers: [
-        new MapboxVectorLayer({
-          styleUrl,
-          accessToken,
-        }),
+        vectorLayer,
         edgeLayerId &&
           new TileLayer({
             source: new TileWMS({
@@ -78,7 +82,7 @@ export function OpenLayersMap({
       }),
       controls: [],
     })
-  }, [edgeLayerId, nodeLayerId, styleUrl, view])
+  }, [edgeLayerId, nodeLayerId, view])
 
   // Initialize the map on component mount
   useEffect(() => {
