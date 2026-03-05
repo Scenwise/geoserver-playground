@@ -28,10 +28,4 @@ export const tools: Record<string, AdminSidebarItem> = {
     href: '/admin/streetview',
     description: 'View location street-level imagery and segmentation.',
   },
-  publicTransport: {
-    title: 'Public transport',
-    icon: BusIcon,
-    href: '/admin/public-transport',
-    description: 'View public transport data and network structure.',
-  },
 }

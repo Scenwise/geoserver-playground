@@ -17,6 +17,7 @@ import { ButtonGroup } from './ui/button-group'
 import { cn } from '@/lib/utils'
 import { OpenLayersMapStyle } from './openlayers-map-style'
 import { OpenLayersMapZoom } from './openlayers-map-zoom'
+import { OpenLayersMapLayers } from './openlayers-map-layers'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -117,10 +118,11 @@ export function OpenLayersMap({
         mapRef={mapRef}
       />
 
-      <OpenLayersMapStyle
-        className="self-end place-self-end mb-3 mr-3"
-        mapRef={mapRef}
-      />
+      <div className="flex gap-3 self-end place-self-end mb-3 mr-3">
+        <OpenLayersMapStyle className="" mapRef={mapRef} />
+
+        <OpenLayersMapLayers mapRef={mapRef} />
+      </div>
     </div>
   )
 }
