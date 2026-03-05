@@ -1,43 +1,59 @@
 import { useTheme } from 'next-themes'
 import { Map } from 'ol'
 import LayerGroup from 'ol/layer/Group'
-import { RefObject, useEffect, useMemo, useState } from 'react'
+import { RefObject, useEffect, useMemo } from 'react'
 import apply from 'ol-mapbox-style'
-import { IconComponent } from '@/lib/types'
-import { MapPinIcon, PaletteIcon, SatelliteIcon, CarIcon } from 'lucide-react'
+import { PaletteIcon, SatelliteIcon, CarIcon } from 'lucide-react'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
 export const MAP_STYLES = {
-  basic: { label: 'Basic', icon: PaletteIcon },
-  streets: { label: 'Streets', icon: CarIcon },
-  satellite: { label: 'Satellite', icon: SatelliteIcon },
+  basic: {
+    label: 'Basic',
+    icon: PaletteIcon,
+    url: {
+      light: 'mapbox://styles/mapbox/light-v11',
+      dark: 'mapbox://styles/mapbox/dark-v11',
+    },
+  },
+  streets: {
+    label: 'Streets',
+    icon: CarIcon,
+    url: {
+      light: 'mapbox://styles/mapbox/streets-v12',
+      dark: 'mapbox://styles/mapbox/streets-v12',
+    },
+  },
+  satellite: {
+    label: 'Satellite',
+    icon: SatelliteIcon,
+    url: {
+      light: 'mapbox://styles/mapbox/satellite-v9',
+      dark: 'mapbox://styles/mapbox/satellite-v9',
+    },
+  },
 }
 
 export type MapStyle = keyof typeof MAP_STYLES
 
 /**
- * Custom hook to manage the map style based on the current theme and satellite mode.
- * It updates the map's base layer whenever the theme or satellite mode changes.
+ * Custom hook to manage the map style based on the current theme and map style.
+ * It updates the map's base layer whenever the theme or style changes.
  *
  * @param mapRef - A ref to the OpenLayers Map instance that needs to be updated when the style changes.
+ * @param style - The desired map style ('basic', 'streets', or 'satellite').
  *
  * @returns styleUrl - The URL of the current map style being used.
- * @returns style - The current map style ('basic', 'streets', or 'satellite').
- * @returns setStyle - A function to update the map style.
  */
-export function useMapStyle(mapRef: RefObject<Map | null>) {
+export function useMapStyle(
+  mapRef: RefObject<Map | null>,
+  style: MapStyle = 'basic',
+) {
   const { resolvedTheme } = useTheme()
-  const [style, setStyle] = useState<MapStyle>('satellite')
 
   const styleUrl = useMemo(() => {
-    if (style === 'streets') return 'mapbox://styles/mapbox/streets-v12'
-    if (style === 'satellite') return 'mapbox://styles/mapbox/satellite-v9'
-
-    // Else, return the basic style based on the theme
-    return resolvedTheme === 'dark'
-      ? 'mapbox://styles/mapbox/dark-v11'
-      : 'mapbox://styles/mapbox/light-v11'
+    const themeKey = (resolvedTheme ?? 'light') as 'light' | 'dark'
+    return MAP_STYLES[style].url[themeKey]
   }, [resolvedTheme, style])
 
   // Change the base layer to trigger a style update when the theme changes
@@ -53,5 +69,5 @@ export function useMapStyle(mapRef: RefObject<Map | null>) {
     layers.insertAt(0, layerGroup)
   }, [mapRef, styleUrl])
 
-  return { styleUrl, style, setStyle }
+  return { styleUrl }
 }

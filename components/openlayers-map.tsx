@@ -15,6 +15,8 @@ import { MinusIcon, PaletteIcon, PlusIcon, SatelliteIcon } from 'lucide-react'
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group'
 import { ButtonGroup } from './ui/button-group'
 import { cn } from '@/lib/utils'
+import { OpenLayersMapStyle } from './openlayers-map-style'
+import { OpenLayersMapZoom } from './openlayers-map-zoom'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -42,11 +44,8 @@ export function OpenLayersMap({
       },
   )
 
-  const { styleUrl, style, setStyle } = useMapStyle(mapRef)
-
-  useEffect(() => {
-    console.log(styleUrl)
-  }, [styleUrl])
+  const [style, setStyle] = useState<MapStyle>('basic')
+  const { styleUrl } = useMapStyle(mapRef, style)
 
   const createMap = useCallback(() => {
     return new Map({
@@ -105,45 +104,20 @@ export function OpenLayersMap({
     }
   }, [createMap, ref])
 
-  function zoom(value: number) {
-    if (!mapRef.current) return
-
-    const view = mapRef.current.getView()
-    view.animate({ zoom: view.getZoom()! + value, duration: 100 })
-  }
-
   return (
     <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10">
       <div className="w-full h-full" ref={mapContainerRef} />
 
-      <ButtonGroup
-        orientation="vertical"
-        className="self-start place-self-end mt-3 mr-3 ring-2 ring-background bg-background rounded-lg shadow"
-      >
-        <Button onClick={() => zoom(1)} variant="outline" size="icon">
-          <PlusIcon />
-        </Button>
-        <Button onClick={() => zoom(-1)} variant="outline" size="icon">
-          <MinusIcon />
-        </Button>
-      </ButtonGroup>
+      <OpenLayersMapZoom
+        className="self-start place-self-end mt-3 mr-3"
+        mapRef={mapRef}
+      />
 
-      <ToggleGroup
-        type="single"
-        variant="outline"
-        className="bg-background self-end place-self-end z-10 mb-3 mr-3 ring-2 ring-background shadow"
-        value={style}
-        onValueChange={(value: string | null) =>
-          value && setStyle(value as MapStyle)
-        }
-      >
-        {Object.entries(MAP_STYLES).map(([key, { label, icon: Icon }]) => (
-          <ToggleGroupItem key={key} value={key}>
-            <Icon />
-            {label}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      <OpenLayersMapStyle
+        className="self-end place-self-end mb-3 mr-3"
+        style={style}
+        onStyleChange={setStyle}
+      />
     </div>
   )
 }
