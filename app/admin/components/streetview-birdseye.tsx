@@ -4,35 +4,37 @@ import { coordinateToLatLng, latLngToCoordinate } from '@/lib/google-maps'
 import { Coordinate } from 'ol/coordinate'
 import { useEffect, useRef } from 'react'
 
-export function StreetviewPanorama({
+export function StreetviewBirdseye({
   position,
   onPositionChange,
 }: {
   position: Coordinate
   onPositionChange: (position: Coordinate, heading: number) => void
+  className?: string
 }) {
   const containerRef = useRef(null)
-  const panoramaRef = useRef<google.maps.StreetViewPanorama>(null)
+  const panoramaRef = useRef<google.maps.Map>(null)
 
   function createPanorama(targetPosition: google.maps.LatLng) {
     if (!containerRef.current || !window.google) return
 
-    return new window.google.maps.StreetViewPanorama(containerRef.current!, {
-      position: targetPosition,
-      pov: { heading: 0, pitch: 0 },
-      zoom: 1,
+    return new window.google.maps.Map(containerRef.current, {
+      center: targetPosition,
+      zoom: 18,
       fullscreenControl: false,
-      addressControl: false,
-      linksControl: false,
+      scaleControl: false,
       zoomControl: false,
       panControl: false,
-      imageDateControl: false,
+      cameraControl: false,
+      mapTypeControl: false,
+      streetViewControl: false,
+      mapTypeId: 'satellite',
     })
   }
 
   // Initialize Street View panorama when position is set
   useEffect(() => {
-    if (panoramaRef.current || !position) return
+    if (panoramaRef.current) return
 
     const targetPosition = coordinateToLatLng(position)
     const panorama = createPanorama(targetPosition)
@@ -40,14 +42,17 @@ export function StreetviewPanorama({
     if (!panorama) return
 
     const updatePanoramaPosition = () => {
-      const position = panorama.getPosition()
-      const pov = panorama.getPov()
-      if (!position || pov === undefined) return
-      onPositionChange(latLngToCoordinate(position), pov.heading)
+      const position = panorama.getCenter()
+
+      // Heading is undefined at initial load, default to 0
+      const heading = panorama.getHeading() ?? 0
+
+      if (!position) return
+      onPositionChange(latLngToCoordinate(position), heading ?? 0)
     }
 
-    panorama.addListener('position_changed', updatePanoramaPosition)
-    panorama.addListener('pov_changed', updatePanoramaPosition)
+    panorama.addListener('dragend', updatePanoramaPosition)
+    panorama.addListener('heading_changed', updatePanoramaPosition)
 
     panoramaRef.current = panorama
   }, [onPositionChange, position])
@@ -58,10 +63,10 @@ export function StreetviewPanorama({
     if (!panorama) return
 
     const targetPosition = coordinateToLatLng(position)
-    const currentPosition = panorama.getPosition()
+    const currentPosition = panorama.getCenter()
 
     if (!currentPosition?.equals(targetPosition)) {
-      panorama.setPosition(targetPosition)
+      panorama.setCenter(targetPosition)
     }
   }, [position])
 

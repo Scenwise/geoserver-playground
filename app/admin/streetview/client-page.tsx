@@ -11,7 +11,6 @@ import {
   PageHeaderDescription,
   PageHeaderTitle,
 } from '@/components/page/page-header'
-import { StreetviewPanorama } from '@/admin/components/streetview-panorama'
 import { useEffect, useRef, useState } from 'react'
 import { Feature, Map } from 'ol'
 import VectorSource from 'ol/source/Vector'
@@ -23,6 +22,7 @@ import { StreetviewSegmentation } from '@/admin/components/streetview-segmentati
 import { Button } from '@/components/ui/button'
 import { RefreshCcwIcon } from 'lucide-react'
 import { tools } from '@/admin/data/admin-sidebar'
+import { StreetviewView } from '../components/streetview-view'
 
 export function StreetviewClientPage({
   map,
@@ -110,7 +110,7 @@ export function StreetviewClientPage({
           />
         </MapContainer>
 
-        <StreetviewPanorama
+        <StreetviewView
           className={
             swappedLayout ? 'col-[1/3] row-[1/3]' : 'col-[3/4] row-[1/2]'
           }
