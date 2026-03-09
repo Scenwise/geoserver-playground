@@ -18,7 +18,10 @@ import { cn } from '@/lib/utils'
 import { OpenLayersMapStyle } from './openlayers-map-style'
 import { OpenLayersMapZoom } from './openlayers-map-zoom'
 import { MapLayer, OpenLayersMapLayers } from './openlayers-map-layers'
-import { useMapLayer } from '@/hooks/use-map-layer'
+import { useGeoJSONLayer, useMapLayer } from '@/hooks/use-map-layer'
+import { Fill, Stroke, Style } from 'ol/style'
+import CircleStyle from 'ol/style/Circle'
+import VectorLayer from 'ol/layer/Vector'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 

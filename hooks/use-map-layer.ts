@@ -1,6 +1,14 @@
 import { Map } from 'ol'
 import { Layer } from 'ol/layer'
-import { RefObject, useEffect, useRef, useState } from 'react'
+import VectorLayer from 'ol/layer/Vector'
+import VectorSource from 'ol/source/Vector'
+import { Fill, Stroke, Style } from 'ol/style'
+import CircleStyle from 'ol/style/Circle'
+import { RefObject, use, useEffect, useRef, useState } from 'react'
+import useSWRImmutable from 'swr/immutable'
+import GeoJSON from 'ol/format/GeoJSON'
+import { fetcher } from '@/lib/fetcher'
+import useSWR from 'swr'
 
 /**
  * Custom hook to manage the visibility of a map layer in an OpenLayers map.
@@ -34,4 +42,37 @@ export function useMapLayer(
     toggle: () => setEnabled((prev) => !prev),
     metadata,
   }
+}
+
+export function useGeoJSONLayer(
+  mapRef: RefObject<Map | null>,
+  layer: VectorLayer,
+  metadata?: { id: string; type: 'node' | 'edge'; defaultEnabled?: boolean },
+) {
+  const sourceRef = useRef<VectorSource>(new VectorSource())
+
+  layer.setSource(sourceRef.current)
+
+  const mapLayer = useMapLayer(mapRef, layer, metadata)
+  const { enabled } = mapLayer
+
+  const { data } = useSWR(
+    enabled ? `/api/geoserver/geojson/${metadata?.id}` : null,
+    fetcher,
+  )
+
+  // Update the vector source with new features when data is fetched
+  useEffect(() => {
+    if (!sourceRef.current || !data) return
+
+    const features = new GeoJSON().readFeatures(data, {
+      dataProjection: 'EPSG:4326',
+      featureProjection: 'EPSG:3857',
+    })
+
+    sourceRef.current.clear()
+    sourceRef.current.addFeatures(features)
+  }, [sourceRef, data])
+
+  return mapLayer
 }
