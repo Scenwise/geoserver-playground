@@ -1,5 +1,5 @@
 import { IconComponent } from '@/lib/types'
-import { BusIcon, ChevronsLeftRightIcon, ViewIcon } from 'lucide-react'
+import { ChevronsLeftRightIcon, ViewIcon } from 'lucide-react'
 
 export type AdminSidebarItem = {
   title: string

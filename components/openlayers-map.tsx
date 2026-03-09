@@ -4,24 +4,16 @@ import { useRef, useEffect, useState, Ref, useCallback } from 'react'
 
 import 'ol/ol.css'
 import { Map, View } from 'ol'
-import { type MapOptions } from 'ol/Map'
 import TileLayer from 'ol/layer/Tile'
 import { TileWMS } from 'ol/source'
-import { applyStyle, MapboxVectorLayer } from 'ol-mapbox-style'
+import { MapboxVectorLayer } from 'ol-mapbox-style'
 import { State } from 'ol/View'
-import { MAP_STYLES, MapStyle, useMapStyle } from '@/hooks/use-map-style'
-import { Button } from './ui/button'
-import { MinusIcon, PaletteIcon, PlusIcon, SatelliteIcon } from 'lucide-react'
-import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group'
-import { ButtonGroup } from './ui/button-group'
+import { useMapStyle } from '@/hooks/use-map-style'
 import { cn } from '@/lib/utils'
 import { OpenLayersMapStyle } from './openlayers-map-style'
 import { OpenLayersMapZoom } from './openlayers-map-zoom'
-import { MapLayer, OpenLayersMapLayers } from './openlayers-map-layers'
-import { useGeoJSONLayer, useMapLayer } from '@/hooks/use-map-layer'
-import { Fill, Stroke, Style } from 'ol/style'
-import CircleStyle from 'ol/style/Circle'
-import VectorLayer from 'ol/layer/Vector'
+import { OpenLayersMapLayers } from './openlayers-map-layers'
+import { useMapLayer } from '@/hooks/use-map-layer'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -69,7 +61,7 @@ export function OpenLayersMap({
       }),
       controls: [],
     })
-  }, [view])
+  }, [styleUrl, view])
 
   // Initialize the map on component mount
   useEffect(() => {

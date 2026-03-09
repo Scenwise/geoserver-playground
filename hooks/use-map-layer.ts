@@ -2,10 +2,7 @@ import { Map } from 'ol'
 import { Layer } from 'ol/layer'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
-import { Fill, Stroke, Style } from 'ol/style'
-import CircleStyle from 'ol/style/Circle'
-import { RefObject, use, useEffect, useRef, useState } from 'react'
-import useSWRImmutable from 'swr/immutable'
+import { RefObject, useEffect, useRef, useState } from 'react'
 import GeoJSON from 'ol/format/GeoJSON'
 import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
@@ -25,11 +22,13 @@ export function useMapLayer(
   useEffect(() => {
     if (!mapRef.current) return
 
-    layerRef.current.setVisible(enabled)
-    mapRef.current.addLayer(layerRef.current)
+    const map = mapRef.current
+    const layer = layerRef.current
+
+    map.addLayer(layer)
 
     return () => {
-      mapRef.current?.removeLayer(layerRef.current)
+      map.removeLayer(layer)
     }
   }, [mapRef])
 
@@ -51,8 +50,6 @@ export function useGeoJSONLayer(
 ) {
   const sourceRef = useRef<VectorSource>(new VectorSource())
 
-  layer.setSource(sourceRef.current)
-
   const mapLayer = useMapLayer(mapRef, layer, metadata)
   const { enabled } = mapLayer
 
@@ -65,6 +62,8 @@ export function useGeoJSONLayer(
   useEffect(() => {
     if (!sourceRef.current || !data) return
 
+    layer.setSource(sourceRef.current)
+
     const features = new GeoJSON().readFeatures(data, {
       dataProjection: 'EPSG:4326',
       featureProjection: 'EPSG:3857',
@@ -72,7 +71,7 @@ export function useGeoJSONLayer(
 
     sourceRef.current.clear()
     sourceRef.current.addFeatures(features)
-  }, [sourceRef, data])
+  }, [sourceRef, data, layer])
 
   return mapLayer
 }

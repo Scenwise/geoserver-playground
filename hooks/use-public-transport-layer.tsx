@@ -1,5 +1,5 @@
 import { fetcher } from '@/lib/fetcher'
-import { Feature, Map, Overlay } from 'ol'
+import { Feature, Map, MapBrowserEvent, Overlay } from 'ol'
 import { FeatureLike } from 'ol/Feature'
 import { Point } from 'ol/geom'
 import VectorLayer from 'ol/layer/Vector'
@@ -40,7 +40,6 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
   const sourceRef = useRef<VectorSource>(new VectorSource())
   const layerRef = useRef<VectorLayer>(
     new VectorLayer({
-      source: sourceRef.current,
       style: new Style({
         image: new CircleStyle({
           radius: 5,
@@ -58,7 +57,11 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
   useEffect(() => {
     if (!mapRef.current || !enabled) return
 
-    mapRef.current.addLayer(layerRef.current)
+    const map = mapRef.current
+    const layer = layerRef.current
+
+    layer.setSource(sourceRef.current)
+    map.addLayer(layerRef.current)
 
     if (!overlayRef.current) {
       overlayRef.current = new Overlay({
@@ -68,11 +71,11 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
       })
     }
 
-    mapRef.current.addOverlay(overlayRef.current)
+    map.addOverlay(overlayRef.current)
 
     return () => {
-      mapRef.current?.removeLayer(layerRef.current)
-      mapRef.current?.removeOverlay(overlayRef.current!)
+      map.removeLayer(layer)
+      map.removeOverlay(overlayRef.current!)
     }
   }, [mapRef, enabled])
 
@@ -80,6 +83,7 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
   useEffect(() => {
     if (!sourceRef.current || !data) return
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const features = data.elements.map((element: any) => {
       const coordinate = transform(
         [element.lon, element.lat],
@@ -106,7 +110,7 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
     if (!mapRef.current || !enabled) return
     const map = mapRef.current
 
-    const handler = (event: any) => {
+    const handler = (event: MapBrowserEvent) => {
       const feature = map.forEachFeatureAtPixel(
         event.pixel,
         (feature) => feature,
