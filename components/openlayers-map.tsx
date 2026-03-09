@@ -17,7 +17,8 @@ import { ButtonGroup } from './ui/button-group'
 import { cn } from '@/lib/utils'
 import { OpenLayersMapStyle } from './openlayers-map-style'
 import { OpenLayersMapZoom } from './openlayers-map-zoom'
-import { OpenLayersMapLayers } from './openlayers-map-layers'
+import { MapLayer, OpenLayersMapLayers } from './openlayers-map-layers'
+import { useMapLayer } from '@/hooks/use-map-layer'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -58,32 +59,14 @@ export function OpenLayersMap({
 
     return new Map({
       target: mapContainerRef.current!,
-      layers: [
-        vectorLayer,
-        edgeLayerId &&
-          new TileLayer({
-            source: new TileWMS({
-              url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
-              params: { layers: edgeLayerId, tiled: true },
-              serverType: 'geoserver',
-            }),
-          }),
-        nodeLayerId &&
-          new TileLayer({
-            source: new TileWMS({
-              url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
-              params: { layers: nodeLayerId, tiled: true },
-              serverType: 'geoserver',
-            }),
-          }),
-      ].filter(Boolean) as MapOptions['layers'],
+      layers: [vectorLayer],
       view: new View({
         projection: 'EPSG:3857',
         ...view,
       }),
       controls: [],
     })
-  }, [edgeLayerId, nodeLayerId, view])
+  }, [view])
 
   // Initialize the map on component mount
   useEffect(() => {
@@ -109,6 +92,27 @@ export function OpenLayersMap({
     }
   }, [createMap, ref])
 
+  const geoserverTileLayer = (layers: string) =>
+    new TileLayer({
+      source: new TileWMS({
+        url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
+        params: { layers, tiled: true },
+        serverType: 'geoserver',
+      }),
+    })
+
+  const edgeLayer = useMapLayer(mapRef, geoserverTileLayer(edgeLayerId ?? ''), {
+    id: edgeLayerId ?? '',
+    type: 'edge',
+    defaultEnabled: true,
+  })
+
+  const nodeLayer = useMapLayer(mapRef, geoserverTileLayer(nodeLayerId ?? ''), {
+    id: nodeLayerId ?? '',
+    type: 'node',
+    defaultEnabled: true,
+  })
+
   return (
     <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10">
       <div className="w-full h-full" ref={mapContainerRef} />
@@ -119,9 +123,12 @@ export function OpenLayersMap({
       />
 
       <div className="flex gap-3 self-end place-self-end mb-3 mr-3">
-        <OpenLayersMapStyle className="" mapRef={mapRef} />
+        <OpenLayersMapStyle mapRef={mapRef} />
 
-        <OpenLayersMapLayers mapRef={mapRef} />
+        <OpenLayersMapLayers
+          mapRef={mapRef}
+          mapLayers={[edgeLayer, nodeLayer]}
+        />
       </div>
     </div>
   )

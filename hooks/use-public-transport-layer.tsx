@@ -30,10 +30,10 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
       fetcher(url, {
         method: 'POST',
         body: `
-    [out:json];
-    node["public_transport"="platform"](${bbox});
-    out;
-  `,
+          [out:json];
+          node["public_transport"="platform"](${bbox});
+          out;
+        `,
       }),
   )
 
