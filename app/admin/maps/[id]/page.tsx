@@ -1,6 +1,9 @@
 'use server'
 
-import { OpenLayersMap, MapContainer } from '@/components/openlayers-map'
+import {
+  OpenLayersMap,
+  MapContainer,
+} from '@/components/openlayers-map/openlayers-map'
 import { GeoserverMapForm } from '../../components/goeserver-map-form'
 import { FeatureCountBadge } from '../../components/feature-count-badge'
 import { Button } from '@/components/ui/button'

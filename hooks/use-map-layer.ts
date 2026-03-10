@@ -16,6 +16,7 @@ export function useMapLayer(
   metadata?: { id: string; type: 'node' | 'edge'; defaultEnabled?: boolean },
 ) {
   const [enabled, setEnabled] = useState(metadata?.defaultEnabled ?? false)
+  const [opacity, setOpacity] = useState(1)
   const layerRef = useRef<Layer>(layer)
 
   // Initialize the layer when the component mounts
@@ -36,9 +37,15 @@ export function useMapLayer(
     layerRef.current.setVisible(enabled)
   }, [enabled])
 
+  useEffect(() => {
+    layerRef.current.setOpacity(opacity)
+  }, [opacity])
+
   return {
     enabled,
     toggle: () => setEnabled((prev) => !prev),
+    opacity,
+    setOpacity,
     metadata,
   }
 }

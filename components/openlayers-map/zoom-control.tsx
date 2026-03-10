@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { MinusIcon, PlusIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export function OpenLayersMapZoom({
+export function ZoomControl({
   mapRef,
   className,
 }: {

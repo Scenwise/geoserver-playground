@@ -10,9 +10,9 @@ import { MapboxVectorLayer } from 'ol-mapbox-style'
 import { State } from 'ol/View'
 import { useMapStyle } from '@/hooks/use-map-style'
 import { cn } from '@/lib/utils'
-import { OpenLayersMapStyle } from './openlayers-map-style'
-import { OpenLayersMapZoom } from './openlayers-map-zoom'
-import { OpenLayersMapLayers } from './openlayers-map-layers'
+import { StyleControl } from './style-control'
+import { ZoomControl } from './zoom-control'
+import { LayersControl } from './layers-control'
 import { useMapLayer } from '@/hooks/use-map-layer'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
@@ -112,18 +112,15 @@ export function OpenLayersMap({
     <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10">
       <div className="w-full h-full" ref={mapContainerRef} />
 
-      <OpenLayersMapZoom
+      <ZoomControl
         className="self-start place-self-end mt-3 mr-3"
         mapRef={mapRef}
       />
 
       <div className="flex gap-3 self-end place-self-end mb-3 mr-3">
-        <OpenLayersMapStyle mapRef={mapRef} />
+        <StyleControl mapRef={mapRef} />
 
-        <OpenLayersMapLayers
-          mapRef={mapRef}
-          mapLayers={[edgeLayer, nodeLayer]}
-        />
+        <LayersControl mapRef={mapRef} mapLayers={[edgeLayer, nodeLayer]} />
       </div>
     </div>
   )

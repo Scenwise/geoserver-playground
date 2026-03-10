@@ -1,4 +1,4 @@
-import { OpenLayersMap } from '@/components/openlayers-map'
+import { OpenLayersMap } from '@/components/openlayers-map/openlayers-map'
 import { Item, ItemFooter } from '@/components/ui/item'
 import { db } from '@/lib/db'
 import { geoserverMaps } from '@/lib/db/schema/geoserver'

@@ -2,7 +2,10 @@
 
 import { geoserverMaps } from '@/lib/db/schema/geoserver'
 
-import { OpenLayersMap, MapContainer } from '@/components/openlayers-map'
+import {
+  OpenLayersMap,
+  MapContainer,
+} from '@/components/openlayers-map/openlayers-map'
 import { PageContainer, PageContent } from '@/components/page/page-container'
 import {
   PageHeader,

@@ -1,4 +1,7 @@
-import { MapContainer, OpenLayersMap } from '@/components/openlayers-map'
+import {
+  MapContainer,
+  OpenLayersMap,
+} from '@/components/openlayers-map/openlayers-map'
 import { ResizablePanel } from '@/components/ui/resizable'
 import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { useEffect, useRef } from 'react'

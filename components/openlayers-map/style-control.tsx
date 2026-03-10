@@ -8,7 +8,7 @@ import LayerGroup from 'ol/layer/Group'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
-export function OpenLayersMapStyle({
+export function StyleControl({
   mapRef,
   className,
 }: {
