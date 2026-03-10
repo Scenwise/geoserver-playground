@@ -49,7 +49,7 @@ export function StyleControl({
       {Object.entries(MAP_STYLES).map(([key, { label, icon: Icon }]) => (
         <ToggleGroupItem key={key} value={key}>
           <Icon />
-          {label}
+          <span className="hidden @sm:block">{label}</span>
         </ToggleGroupItem>
       ))}
     </ToggleGroup>

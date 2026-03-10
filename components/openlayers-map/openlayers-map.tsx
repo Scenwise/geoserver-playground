@@ -61,7 +61,10 @@ export function OpenLayersMap({
       }),
       controls: [],
     })
-  }, [styleUrl, view])
+
+    // Should only run once on mount, dependencies are managed in the useEffect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Initialize the map on component mount
   useEffect(() => {
@@ -109,7 +112,7 @@ export function OpenLayersMap({
   })
 
   return (
-    <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10">
+    <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10 @container">
       <div className="w-full h-full" ref={mapContainerRef} />
 
       <ZoomControl
