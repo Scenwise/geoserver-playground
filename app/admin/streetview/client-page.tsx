@@ -25,7 +25,7 @@ import { StreetviewSegmentation } from '@/admin/components/streetview-segmentati
 import { Button } from '@/components/ui/button'
 import { RefreshCcwIcon } from 'lucide-react'
 import { tools } from '@/admin/data/admin-sidebar'
-import { StreetviewView } from '../components/streetview-view'
+import { StreetviewContainer } from '../components/streetview-container'
 
 export function StreetviewClientPage({
   map,
@@ -113,7 +113,7 @@ export function StreetviewClientPage({
           />
         </MapContainer>
 
-        <StreetviewView
+        <StreetviewContainer
           className={
             swappedLayout ? 'col-[1/3] row-[1/3]' : 'col-[3/4] row-[1/2]'
           }

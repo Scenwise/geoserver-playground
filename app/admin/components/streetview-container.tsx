@@ -5,7 +5,7 @@ import { StreetviewBirdseye } from './streetview-birdseye'
 import { cn } from '@/lib/utils'
 import { SquareMousePointerIcon } from 'lucide-react'
 
-export function StreetviewView({
+export function StreetviewContainer({
   position,
   onPositionChange,
   className = '',
