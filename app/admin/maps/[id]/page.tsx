@@ -95,12 +95,12 @@ export default async function MapPage({
       <PageContent className="space-y-2">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           Layers
-          {/* <GeoserverLayerForm data={{ geoserverMapId: geoserverMap.id }}>
+          <GeoserverLayerForm data={{ geoserverMapId: geoserverMap.id }}>
             <Button variant="secondary" size="sm">
               <PlusIcon />
               Add layer
             </Button>
-          </GeoserverLayerForm> */}
+          </GeoserverLayerForm>
         </h3>
         {geoserverMap.layers.length > 0 && (
           <div className="flex gap-4">

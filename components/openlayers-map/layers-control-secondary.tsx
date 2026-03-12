@@ -46,6 +46,28 @@ export function LayersControlSecondary({
           step={0.1}
         />
       </DropdownMenuItem>
+
+      {'alignIndex' in mapLayer && (
+        <DropdownMenuItem
+          inset
+          disabled={!mapLayer.enabled}
+          className="flex-col gap-3 py-2 items-stretch"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span>Alignment</span>
+            <span className="text-xs text-muted-foreground">
+              {mapLayer.alignIndex}
+            </span>
+          </div>
+          <Slider
+            value={[mapLayer.alignIndex]}
+            onValueChange={([value]) => mapLayer.setAlignIndex(value)}
+            min={-50}
+            max={50}
+            step={1}
+          />
+        </DropdownMenuItem>
+      )}
     </>
   )
 }

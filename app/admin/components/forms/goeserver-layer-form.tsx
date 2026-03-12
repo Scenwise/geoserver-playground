@@ -147,17 +147,33 @@ export function GeoserverLayerForm({
 
                   <RadioGroup
                     id="geoserver-layer-form-type"
-                    {...field}
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
                     aria-invalid={fieldState.invalid}
                     className="grid grid-cols-2 gap-4"
                   >
-                    <Field orientation="horizontal">
-                      <RadioGroupItem value="nodes" id="type-nodes" />
+                    <Field
+                      orientation="horizontal"
+                      data-invalid={fieldState.invalid}
+                    >
+                      <RadioGroupItem
+                        value="nodes"
+                        id="type-nodes"
+                        aria-invalid={fieldState.invalid}
+                      />
                       <FieldLabel htmlFor="type-nodes">Nodes</FieldLabel>
                     </Field>
 
-                    <Field orientation="horizontal">
-                      <RadioGroupItem value="edges" id="type-edges" />
+                    <Field
+                      orientation="horizontal"
+                      data-invalid={fieldState.invalid}
+                    >
+                      <RadioGroupItem
+                        value="edges"
+                        id="type-edges"
+                        aria-invalid={fieldState.invalid}
+                      />
                       <FieldLabel htmlFor="type-edges">Edges</FieldLabel>
                     </Field>
                   </RadioGroup>

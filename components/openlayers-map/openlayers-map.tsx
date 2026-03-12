@@ -14,6 +14,7 @@ import { StyleControl } from './style-control'
 import { ZoomControl } from './zoom-control'
 import { LayersControl } from './layers-control'
 import { useMapLayer } from '@/hooks/use-map-layer'
+import { useCustomMapLayer } from '@/hooks/use-custom-map-layer'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -99,25 +100,32 @@ export function OpenLayersMap({ ref, initialView, layers }: OpenLayersProps) {
       }),
     })
 
-  const edgeLayerId = useMemo(
-    () => layers?.find((layer) => layer.type === 'edges')?.layerId,
-    [layers],
-  )
-  const edgeLayer = useMapLayer(mapRef, geoserverTileLayer(edgeLayerId ?? ''), {
-    id: edgeLayerId ?? '',
-    type: 'edge',
-    defaultEnabled: true,
-  })
+  // const edgeLayerId = useMemo(
+  //   () => layers?.find((layer) => layer.type === 'edges')?.layerId,
+  //   [layers],
+  // )
+  // const edgeLayer = useMapLayer(mapRef, geoserverTileLayer(edgeLayerId ?? ''), {
+  //   id: edgeLayerId ?? '',
+  //   type: 'edge',
+  //   defaultEnabled: true,
+  // })
 
-  const nodeLayerId = useMemo(
-    () => layers?.find((layer) => layer.type === 'nodes')?.layerId,
-    [layers],
-  )
-  const nodeLayer = useMapLayer(mapRef, geoserverTileLayer(nodeLayerId ?? ''), {
-    id: nodeLayerId ?? '',
-    type: 'node',
-    defaultEnabled: true,
-  })
+  // const nodeLayerId = useMemo(
+  //   () => layers?.find((layer) => layer.type === 'nodes')?.layerId,
+  //   [layers],
+  // )
+  // const nodeLayer = useMapLayer(mapRef, geoserverTileLayer(nodeLayerId ?? ''), {
+  //   id: nodeLayerId ?? '',
+  //   type: 'node',
+  //   defaultEnabled: true,
+  // })
+
+  // const customLayerId = useMemo(
+  //   () => layers?.find((layer) => layer.layerId === 'custom')?.layerId,
+  //   [layers],
+  // )
+
+  const customLayer = useCustomMapLayer(mapRef)
 
   return (
     <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10 @container">
@@ -131,7 +139,10 @@ export function OpenLayersMap({ ref, initialView, layers }: OpenLayersProps) {
       <div className="flex gap-3 self-end place-self-end mb-3 mr-3">
         <StyleControl mapRef={mapRef} />
 
-        <LayersControl mapRef={mapRef} mapLayers={[edgeLayer, nodeLayer]} />
+        <LayersControl
+          mapRef={mapRef}
+          mapLayers={[/*edgeLayer, nodeLayer,*/ customLayer]}
+        />
       </div>
     </div>
   )

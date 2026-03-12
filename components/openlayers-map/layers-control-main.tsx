@@ -8,8 +8,9 @@ import { SplineIcon, GitCommitIcon, ChevronRightIcon } from 'lucide-react'
 import { LayersControlPublicTransport } from './layers-control-public-transport'
 import { Map } from 'ol'
 import { cn } from '@/lib/utils'
+import { useCustomMapLayer } from '@/hooks/use-custom-map-layer'
 
-export type MapLayer = ReturnType<typeof useMapLayer>
+export type MapLayer = ReturnType<typeof useMapLayer | typeof useCustomMapLayer>
 
 export function LayersControlMain({
   mapRef,
