@@ -21,6 +21,7 @@ import { LayersControl } from './layers-control'
 import { GeoserverTileLayer } from './tile-layers'
 import { Layer } from 'ol/layer'
 import { CustomLayer } from './custom-layers'
+import { MapLayerStoreProvider } from '@/providers/MapLayerStoreProvider'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -43,7 +44,15 @@ interface OpenLayersMapProps {
   }[]
 }
 
-export function OpenLayersMap({
+export function OpenLayersMap(props: OpenLayersMapProps) {
+  return (
+    <MapLayerStoreProvider>
+      <OpenLayersMapInner {...props} />
+    </MapLayerStoreProvider>
+  )
+}
+
+function OpenLayersMapInner({
   ref,
   onMapReady,
   initialView,

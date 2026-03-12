@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createStore } from 'zustand'
 
 export interface BaseLayerState {
   id: string
@@ -20,7 +20,7 @@ export interface CustomLayerState extends BaseLayerState {
 
 export type LayerState = GeoserverTileLayerState | CustomLayerState
 
-interface MapLayerStore {
+export interface MapLayerStore {
   layers: Record<string, LayerState>
   registerLayer: (
     id: string,
@@ -35,51 +35,54 @@ interface MapLayerStore {
   setAlignIndex: (id: string, alignIndex: number) => void
 }
 
-export const useMapLayerStore = create<MapLayerStore>((set) => ({
-  layers: {},
-  registerLayer: (id, source, type, defaultEnabled = false) =>
-    set((state) => ({
-      layers: {
-        ...state.layers,
-        [id]: {
-          id,
-          source,
-          type,
-          enabled: defaultEnabled,
-          opacity: 1,
-          alignIndex: 0,
-        },
-      },
-    })),
-  unregisterLayer: (id) =>
-    set((state) => {
-      const { [id]: _, ...rest } = state.layers
-      return { layers: rest }
-    }),
-  setEnabled: (id, enabled) =>
-    set((state) => ({
-      layers: { ...state.layers, [id]: { ...state.layers[id], enabled } },
-    })),
-  toggleLayer: (id) =>
-    set((state) => ({
-      layers: {
-        ...state.layers,
-        [id]: { ...state.layers[id], enabled: !state.layers[id].enabled },
-      },
-    })),
-  setOpacity: (id, opacity) =>
-    set((state) => ({
-      layers: { ...state.layers, [id]: { ...state.layers[id], opacity } },
-    })),
-  setAlignIndex: (id, alignIndex) =>
-    set((state) => {
-      const layer = state.layers[id]
-      if (layer?.source !== 'custom') return state
-      return {
+export const createMapLayerStore = () =>
+  createStore<MapLayerStore>((set) => ({
+    layers: {},
+    registerLayer: (id, source, type, defaultEnabled = false) =>
+      set((state) => ({
         layers: {
           ...state.layers,
-          [id]: { ...layer, alignIndex },
+          [id]: {
+            id,
+            source,
+            type,
+            enabled: defaultEnabled,
+            opacity: 1,
+            alignIndex: 0,
+          },
         },
-      }
-    }),
-}))
+      })),
+    unregisterLayer: (id) =>
+      set((state) => {
+        const { [id]: _, ...rest } = state.layers
+        return { layers: rest }
+      }),
+    setEnabled: (id, enabled) =>
+      set((state) => ({
+        layers: { ...state.layers, [id]: { ...state.layers[id], enabled } },
+      })),
+    toggleLayer: (id) =>
+      set((state) => ({
+        layers: {
+          ...state.layers,
+          [id]: { ...state.layers[id], enabled: !state.layers[id].enabled },
+        },
+      })),
+    setOpacity: (id, opacity) =>
+      set((state) => ({
+        layers: { ...state.layers, [id]: { ...state.layers[id], opacity } },
+      })),
+    setAlignIndex: (id, alignIndex) =>
+      set((state) => {
+        const layer = state.layers[id]
+        if (layer?.source !== 'custom') return state
+        return {
+          layers: {
+            ...state.layers,
+            [id]: { ...layer, alignIndex },
+          },
+        }
+      }),
+  }))
+
+export type MapLayerStoreInstance = ReturnType<typeof createMapLayerStore>

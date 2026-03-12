@@ -6,7 +6,7 @@ import { useMapLayer } from './use-map-layer'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import { Map } from 'ol'
-import { useMapLayerStore } from '@/store/mapLayerStore'
+import { useMapLayerStore } from '@/providers/MapLayerStoreProvider'
 
 export function useCustomMapLayer(map: Map | null) {
   const sourceRef = useRef<VectorSource>(new VectorSource())

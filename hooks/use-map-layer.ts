@@ -6,7 +6,8 @@ import { useEffect, useRef } from 'react'
 import GeoJSON from 'ol/format/GeoJSON'
 import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
-import { LayerState, useMapLayerStore } from '@/store/mapLayerStore'
+import { LayerState } from '@/store/mapLayerStore'
+import { useMapLayerStore } from '@/providers/MapLayerStoreProvider'
 
 /**
  * Custom hook to manage the visibility of a map layer in an OpenLayers map.

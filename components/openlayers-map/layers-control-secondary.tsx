@@ -2,7 +2,7 @@ import { DropdownMenuItem, DropdownMenuLabel } from '../ui/dropdown-menu'
 import { ArrowLeftIcon } from 'lucide-react'
 import { Slider } from '../ui/slider'
 import { Switch } from '../ui/switch'
-import { useMapLayerStore } from '@/store/mapLayerStore'
+import { useMapLayerStore } from '@/providers/MapLayerStoreProvider'
 
 export function LayersControlSecondary({
   mapLayerId,

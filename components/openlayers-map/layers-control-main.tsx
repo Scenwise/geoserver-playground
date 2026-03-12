@@ -8,7 +8,7 @@ import { LayersControlPublicTransport } from './layers-control-public-transport'
 import { Map } from 'ol'
 import { cn } from '@/lib/utils'
 import { useShallow } from 'zustand/react/shallow'
-import { useMapLayerStore } from '@/store/mapLayerStore'
+import { useMapLayerStore } from '@/providers/MapLayerStoreProvider'
 
 export function LayersControlMain({
   map,
