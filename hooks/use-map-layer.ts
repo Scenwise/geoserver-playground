@@ -32,6 +32,11 @@ export function useMapLayer(
     }
   }, [map])
 
+  // Keep layerRef in sync with the latest layer instance changes
+  useEffect(() => {
+    layerRef.current = layer
+  }, [layer])
+
   useEffect(() => {
     layerRef.current.setVisible(enabled)
   }, [enabled])

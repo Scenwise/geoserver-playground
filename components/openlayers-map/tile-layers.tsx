@@ -2,6 +2,7 @@ import { useMapLayer } from '@/hooks/use-map-layer'
 import { Map } from 'ol'
 import TileLayer from 'ol/layer/Tile'
 import { TileWMS } from 'ol/source'
+import { useMemo } from 'react'
 
 export function GeoserverTileLayer({
   map,
@@ -16,16 +17,19 @@ export function GeoserverTileLayer({
     layerId: string
   }
 }) {
-  const geoserverTileLayer = (layers: string) =>
-    new TileLayer({
-      source: new TileWMS({
-        url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
-        params: { layers, tiled: true },
-        serverType: 'geoserver',
+  const olLayer = useMemo(
+    () =>
+      new TileLayer({
+        source: new TileWMS({
+          url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
+          params: { layers: layer.layerId, tiled: true },
+          serverType: 'geoserver',
+        }),
       }),
-    })
+    [layer.layerId],
+  )
 
-  useMapLayer(map, geoserverTileLayer(layer.layerId), {
+  useMapLayer(map, olLayer, {
     id: layer.layerId,
     type: layer.type,
     defaultEnabled: true,
