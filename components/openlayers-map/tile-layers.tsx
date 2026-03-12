@@ -31,6 +31,7 @@ export function GeoserverTileLayer({
 
   useMapLayer(map, olLayer, {
     id: layer.layerId,
+    source: 'geoserver-tile',
     type: layer.type,
     defaultEnabled: true,
   })

@@ -8,7 +8,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { usePublicTransportLayer } from '@/hooks/use-public-transport-layer'
 import { useMapLayer } from '@/hooks/use-map-layer'
 import { LayersControlMain } from './layers-control-main'
@@ -19,7 +19,6 @@ export type MapLayer = ReturnType<typeof useMapLayer>
 export function LayersControl({
   map,
   className,
-  mapLayers,
 }: {
   map: Map | null
   className?: string
@@ -29,12 +28,7 @@ export function LayersControl({
 
   const { popup } = usePublicTransportLayer(map)
 
-  const [selected, setSelected] = useState<string | null>(null)
-  const mapLayer = useMemo(() => {
-    if (!selected || !mapLayers) return null
-
-    return mapLayers.find((layer) => layer.metadata?.id === selected) ?? null
-  }, [selected, mapLayers])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   return (
     <>
@@ -64,17 +58,13 @@ export function LayersControl({
             className="bg-background/80 ring-2 ring-background backdrop-blur-lg shadow-lg min-w-60 transition-[max-height] duration-300 overflow-hidden"
           >
             <DropdownMenuGroup>
-              {mapLayer !== null ? (
+              {selectedId !== null ? (
                 <LayersControlSecondary
-                  mapLayer={mapLayer}
-                  setSelected={setSelected}
+                  mapLayerId={selectedId}
+                  setSelected={setSelectedId}
                 />
               ) : (
-                <LayersControlMain
-                  map={map}
-                  mapLayers={mapLayers}
-                  setSelected={setSelected}
-                />
+                <LayersControlMain map={map} setSelected={setSelectedId} />
               )}
             </DropdownMenuGroup>
           </DropdownMenuContent>

@@ -99,55 +99,6 @@ export function OpenLayersMap({
     }
   }, [map])
 
-  // const geoserverTileLayer = (layers: string) =>
-  //   new TileLayer({
-  //     source: new TileWMS({
-  //       url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
-  //       params: { layers, tiled: true },
-  //       serverType: 'geoserver',
-  //     }),
-  //   })
-
-  // const tileLayers = layers?.map((layer) =>
-  //   useMapLayer(
-  //     mapRef,
-  //     geoserverTileLayer(layer.layerId),
-  //     {
-  //       id: String(layer.id),
-  //       type: layer.type === 'edges' ? 'edge' : 'node',
-  //       defaultEnabled: true,
-  //     },
-  //     [layer.layerId],
-  //   ),
-  // )
-
-  // const edgeLayerId = useMemo(
-  //   () => layers?.find((layer) => layer.type === 'edges')?.layerId,
-  //   [layers],
-  // )
-  // useMapLayer(mapRef, geoserverTileLayer(edgeLayerId ?? ''), {
-  //   id: edgeLayerId ?? '',
-  //   type: 'edges',
-  //   defaultEnabled: true,
-  // })
-
-  // const nodeLayerId = useMemo(
-  //   () => layers?.find((layer) => layer.type === 'nodes')?.layerId,
-  //   [layers],
-  // )
-  // const nodeLayer = useMapLayer(mapRef, geoserverTileLayer(nodeLayerId ?? ''), {
-  //   id: nodeLayerId ?? '',
-  //   type: 'node',
-  //   defaultEnabled: true,
-  // })
-
-  // const customLayerId = useMemo(
-  //   () => layers?.find((layer) => layer.layerId === 'custom')?.layerId,
-  //   [layers],
-  // )
-
-  // const customLayer = useCustomMapLayer(mapRef)
-
   const tileLayers = useMemo(() => {
     if (!layers) return []
 
