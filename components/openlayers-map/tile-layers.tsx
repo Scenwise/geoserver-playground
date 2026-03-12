@@ -1,4 +1,5 @@
 import { useMapLayer } from '@/hooks/use-map-layer'
+import { GeoserverLayer } from '@/store/mapLayerStore'
 import { Map } from 'ol'
 import TileLayer from 'ol/layer/Tile'
 import { TileWMS } from 'ol/source'
@@ -9,13 +10,7 @@ export function GeoserverTileLayer({
   layer,
 }: {
   map: Map | null
-  layer: {
-    id: number
-    name: string
-    type: 'nodes' | 'edges'
-    geoserverMapId: number
-    layerId: string
-  }
+  layer: GeoserverLayer
 }) {
   const olLayer = useMemo(
     () =>
@@ -29,12 +24,7 @@ export function GeoserverTileLayer({
     [layer.layerId],
   )
 
-  useMapLayer(map, olLayer, {
-    id: layer.layerId,
-    source: 'geoserver-tile',
-    type: layer.type,
-    defaultEnabled: true,
-  })
+  useMapLayer(map, olLayer, layer)
 
   return null
 }

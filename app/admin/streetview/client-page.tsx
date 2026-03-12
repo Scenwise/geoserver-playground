@@ -109,7 +109,7 @@ export function StreetviewClientPage({
             swappedLayout ? 'col-[3/4] row-[1/2]' : 'col-[1/3] row-[1/3]'
           }
         >
-          <OpenLayersMap onMapReady={setMap} layers={map?.layers} />
+          <OpenLayersMap onMapReady={setMap} mapData={map} />
         </MapContainer>
 
         <StreetviewContainer

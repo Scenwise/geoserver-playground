@@ -15,7 +15,7 @@ export function LayersControlMain({
   setSelected,
 }: {
   map: Map | null
-  setSelected: (selected: string | null) => void
+  setSelected: (selected: number | null) => void
 }) {
   const layers = useMapLayerStore(
     useShallow((state) => Object.values(state.layers)),
@@ -34,7 +34,7 @@ export function LayersControlMain({
           {layer.type === 'edges' ? <SplineIcon /> : <GitCommitIcon />}
 
           <span className={cn('first-letter:capitalize grow')}>
-            {layer.type}
+            {layer.name}
           </span>
 
           {layer.opacity < 1 && layer.enabled && (

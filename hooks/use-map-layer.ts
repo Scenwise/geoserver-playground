@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react'
 import GeoJSON from 'ol/format/GeoJSON'
 import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
-import { LayerState } from '@/store/mapLayerStore'
+import { GeoserverLayer } from '@/store/mapLayerStore'
 import { useMapLayerStore } from '@/providers/MapLayerStoreProvider'
 
 /**
@@ -15,12 +15,7 @@ import { useMapLayerStore } from '@/providers/MapLayerStoreProvider'
 export function useMapLayer(
   map: Map | null,
   layer: Layer,
-  metadata?: {
-    id: string
-    source: LayerState['source']
-    type: 'nodes' | 'edges'
-    defaultEnabled?: boolean
-  },
+  metadata?: GeoserverLayer,
 ) {
   const layerRef = useRef<Layer>(layer)
 
@@ -32,15 +27,10 @@ export function useMapLayer(
 
   // Register/unregister in store
   useEffect(() => {
-    if (!metadata?.id) return
-    registerLayer(
-      metadata.id,
-      metadata.source,
-      metadata.type,
-      metadata.defaultEnabled,
-    )
+    if (!metadata) return
+    registerLayer(metadata, true)
     return () => unregisterLayer(metadata.id)
-  }, [metadata?.id])
+  }, [metadata, registerLayer, unregisterLayer])
 
   // Add/remove OL layer
   useEffect(() => {
@@ -82,12 +72,7 @@ export function useMapLayer(
 export function useGeoJSONLayer(
   map: Map | null,
   layer: VectorLayer,
-  metadata?: {
-    id: string
-    source: LayerState['source']
-    type: 'nodes' | 'edges'
-    defaultEnabled?: boolean
-  },
+  metadata?: GeoserverLayer,
 ) {
   const sourceRef = useRef<VectorSource>(new VectorSource())
 

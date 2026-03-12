@@ -74,7 +74,7 @@ export function CompareMap({
       <MapContainer className="grow">
         <OpenLayersMap
           key={`map-${map?.id}`}
-          layers={map?.layers}
+          mapData={map}
           onMapReady={setMap}
         />
       </MapContainer>

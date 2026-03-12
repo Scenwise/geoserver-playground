@@ -1,9 +1,5 @@
 'use server'
 
-import {
-  OpenLayersMap,
-  MapContainer,
-} from '@/components/openlayers-map/openlayers-map'
 import { GeoserverMapForm } from '../../components/forms/goeserver-map-form'
 import { FeatureCountBadge } from '../../components/feature-count-badge'
 import { Button } from '@/components/ui/button'
@@ -32,6 +28,7 @@ import {
 import { getGeoserverMapById } from '../../actions/geoserver-map'
 import { notFound } from 'next/navigation'
 import { GeoserverLayerForm } from '@/admin/components/forms/goeserver-layer-form'
+import { GeoserverMapEditor } from '@/admin/components/geoserver-map-editor'
 
 export default async function MapPage({
   params,
@@ -111,11 +108,7 @@ export default async function MapPage({
         )}
       </PageContent>
 
-      <PageContent className="grow flex">
-        <MapContainer>
-          <OpenLayersMap layers={geoserverMap.layers} />
-        </MapContainer>
-      </PageContent>
+      <GeoserverMapEditor map={geoserverMap} />
     </PageContainer>
   )
 }

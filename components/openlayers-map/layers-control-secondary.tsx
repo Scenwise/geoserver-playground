@@ -8,11 +8,11 @@ export function LayersControlSecondary({
   mapLayerId,
   setSelected,
 }: {
-  mapLayerId: string
-  setSelected: (selected: string | null) => void
+  mapLayerId: number
+  setSelected: (selected: number | null) => void
 }) {
   const { toggleLayer, setOpacity, setAlignIndex } = useMapLayerStore()
-  const { type, enabled, opacity, source } = useMapLayerStore(
+  const { name, enabled, opacity, source } = useMapLayerStore(
     (state) => state.layers[mapLayerId],
   )
   const alignIndex = useMapLayerStore((state) => {
@@ -28,7 +28,7 @@ export function LayersControlSecondary({
       >
         <ArrowLeftIcon className="text-muted-foreground" />
         <DropdownMenuLabel className="first-letter:capitalize px-0">
-          {type}
+          {name}
         </DropdownMenuLabel>
       </DropdownMenuItem>
       <DropdownMenuItem inset onSelect={() => toggleLayer(mapLayerId)}>

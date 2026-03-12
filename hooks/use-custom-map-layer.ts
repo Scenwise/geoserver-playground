@@ -7,8 +7,12 @@ import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import { Map } from 'ol'
 import { useMapLayerStore } from '@/providers/MapLayerStoreProvider'
+import { GeoserverLayer } from '@/store/mapLayerStore'
 
-export function useCustomMapLayer(map: Map | null) {
+export function useCustomMapLayer(
+  map: Map | null,
+  layerMetadata: GeoserverLayer,
+) {
   const sourceRef = useRef<VectorSource>(new VectorSource())
 
   const layer = useMemo(
@@ -22,18 +26,13 @@ export function useCustomMapLayer(map: Map | null) {
     [],
   )
 
-  const mapLayer = useMapLayer(map, layer, {
-    id: 'custom',
-    source: 'custom',
-    type: 'edges',
-    defaultEnabled: true,
-  })
+  const mapLayer = useMapLayer(map, layer, layerMetadata)
   const { enabled } = mapLayer
 
   const { data } = useSWR(enabled ? '/ag_analysis_object.json' : null, fetcher)
 
   const alignIndex = useMapLayerStore((state) => {
-    const layer = state.layers.custom
+    const layer = state.layers[layerMetadata.id]
     return layer?.source === 'custom' ? layer.alignIndex : 0
   })
   const { setAlignIndex } = useMapLayerStore()

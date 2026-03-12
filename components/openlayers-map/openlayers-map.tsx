@@ -12,7 +12,6 @@ import {
 import 'ol/ol.css'
 import { Map, View } from 'ol'
 import { MapboxVectorLayer } from 'ol-mapbox-style'
-import { State } from 'ol/View'
 import { useMapStyle } from '@/hooks/use-map-style'
 import { cn } from '@/lib/utils'
 import { StyleControl } from './style-control'
@@ -22,6 +21,7 @@ import { GeoserverTileLayer } from './tile-layers'
 import { Layer } from 'ol/layer'
 import { CustomLayer } from './custom-layers'
 import { MapLayerStoreProvider } from '@/providers/MapLayerStoreProvider'
+import { getGeoserverMapById } from '@/admin/actions/geoserver-map'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -33,15 +33,7 @@ export type MapHandle = {
 interface OpenLayersMapProps {
   ref?: Ref<MapHandle>
   onMapReady?: (map: Map) => void
-  initialView?: Partial<State>
-  layers?: {
-    id: number
-    name: string
-    type: 'nodes' | 'edges'
-    source: 'geoserver-tile' | 'geoserver-geojson' | 'custom'
-    geoserverMapId: number
-    layerId: string
-  }[]
+  mapData?: Awaited<ReturnType<typeof getGeoserverMapById>>
 }
 
 export function OpenLayersMap(props: OpenLayersMapProps) {
@@ -52,22 +44,9 @@ export function OpenLayersMap(props: OpenLayersMapProps) {
   )
 }
 
-function OpenLayersMapInner({
-  ref,
-  onMapReady,
-  initialView,
-  layers,
-}: OpenLayersMapProps) {
+function OpenLayersMapInner({ ref, onMapReady, mapData }: OpenLayersMapProps) {
   const vectorLayerRef = useRef<MapboxVectorLayer | null>(null)
   const { styleUrl } = useMapStyle()
-
-  const [view] = useState<Partial<State>>(
-    () =>
-      initialView || {
-        center: [497598, 6785131],
-        zoom: 17,
-      },
-  )
 
   const [map, setMap] = useState<Map | null>(null)
   const mapRef = useCallback(
@@ -84,7 +63,11 @@ function OpenLayersMapInner({
         layers: [vectorLayer],
         view: new View({
           projection: 'EPSG:3857',
-          ...view,
+          center:
+            mapData?.initialX && mapData?.initialY
+              ? [mapData.initialX, mapData.initialY]
+              : [497598, 6785131],
+          zoom: mapData?.initialZoom ?? 17,
         }),
         controls: [],
       })
@@ -109,16 +92,16 @@ function OpenLayersMapInner({
   }, [map])
 
   const tileLayers = useMemo(() => {
-    if (!layers) return []
+    if (!mapData?.layers) return []
 
-    return layers.filter((layer) => layer.source === 'geoserver-tile')
-  }, [layers])
+    return mapData.layers.filter((layer) => layer.source === 'geoserver-tile')
+  }, [mapData?.layers])
 
   const customLayers = useMemo(() => {
-    if (!layers) return []
+    if (!mapData?.layers) return []
 
-    return layers.filter((layer) => layer.source === 'custom')
-  }, [layers])
+    return mapData.layers.filter((layer) => layer.source === 'custom')
+  }, [mapData?.layers])
 
   return (
     <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10 @container">
@@ -137,7 +120,7 @@ function OpenLayersMapInner({
       ))}
 
       {customLayers.map((layer) => (
-        <CustomLayer map={map} key={layer.id} />
+        <CustomLayer map={map} layer={layer} key={layer.id} />
       ))}
     </div>
   )

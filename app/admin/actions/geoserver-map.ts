@@ -67,6 +67,22 @@ export const setGeoServerMapMain = async (id: number) => {
   refresh()
 }
 
+export const setGeoServerInitialView = async (
+  id: number,
+  initialX: number,
+  initialY: number,
+  initialZoom: number,
+) => {
+  await verifySession()
+
+  await db
+    .update(geoserverMaps)
+    .set({ initialX, initialY, initialZoom })
+    .where(eq(geoserverMaps.id, id))
+
+  refresh()
+}
+
 export type UpsertGeoserverMap =
   | typeof geoserverMaps.$inferSelect
   | typeof geoserverMaps.$inferInsert

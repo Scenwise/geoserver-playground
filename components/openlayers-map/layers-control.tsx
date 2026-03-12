@@ -28,7 +28,7 @@ export function LayersControl({
 
   const { popup } = usePublicTransportLayer(map)
 
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
 
   return (
     <>
