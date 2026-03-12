@@ -1,10 +1,11 @@
 import { MAP_STYLES, MapStyle, useMapStyle } from '@/hooks/use-map-style'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Map } from 'ol'
 import { apply } from 'ol-mapbox-style'
 import LayerGroup from 'ol/layer/Group'
+import { useMapSettingsStore } from '@/store/mapSettingsStore'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -15,7 +16,7 @@ export function StyleControl({
   map: Map | null
   className?: string
 }) {
-  const [style, setStyle] = useState<MapStyle>('basic')
+  const { mapStyle: style, setMapStyle: setStyle } = useMapSettingsStore()
   const { styleUrl } = useMapStyle(style)
 
   function onValueChange(value: string) {
