@@ -7,14 +7,23 @@ export const geoserverMaps = pgTable('geoserver_maps', {
   version: integer().notNull(),
   isMain: boolean().unique(),
   description: varchar({ length: 255 }),
+  initialX: integer(),
+  initialY: integer(),
+  initialZoom: integer(),
 })
 
+export const layerSourceEnum = pgEnum('layer_source', [
+  'geoserver-tile',
+  'geoserver-geojson',
+  'custom',
+])
 export const layerTypeEnum = pgEnum('layer_type', ['nodes', 'edges'])
 export const geoserverMapLayers = pgTable('geoserver_map_layers', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   geoserverMapId: integer()
     .notNull()
     .references(() => geoserverMaps.id, { onDelete: 'cascade' }),
+  source: layerSourceEnum().notNull().default('geoserver-tile'),
   layerId: varchar({ length: 255 }).notNull(),
   name: varchar({ length: 255 }).notNull(),
   type: layerTypeEnum().notNull(),

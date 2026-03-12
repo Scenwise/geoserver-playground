@@ -1,11 +1,16 @@
 'use client'
 
-import { useRef, useEffect, useState, Ref, useCallback, useMemo } from 'react'
+import {
+  useRef,
+  useState,
+  Ref,
+  useCallback,
+  useMemo,
+  useImperativeHandle,
+} from 'react'
 
 import 'ol/ol.css'
 import { Map, View } from 'ol'
-import TileLayer from 'ol/layer/Tile'
-import { TileWMS } from 'ol/source'
 import { MapboxVectorLayer } from 'ol-mapbox-style'
 import { State } from 'ol/View'
 import { useMapStyle } from '@/hooks/use-map-style'
@@ -13,26 +18,39 @@ import { cn } from '@/lib/utils'
 import { StyleControl } from './style-control'
 import { ZoomControl } from './zoom-control'
 import { LayersControl } from './layers-control'
-import { useMapLayer } from '@/hooks/use-map-layer'
-import { useCustomMapLayer } from '@/hooks/use-custom-map-layer'
+import { GeoserverTileLayer } from './tile-layers'
+import { Layer } from 'ol/layer'
+import { CustomLayer } from './custom-layers'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
-interface OpenLayersProps {
-  ref?: Ref<Map>
+export type MapHandle = {
+  addLayer: (layer: Layer) => void
+  getMap: () => Map | null
+}
+
+interface OpenLayersMapProps {
+  ref?: Ref<MapHandle>
+  onMapReady?: (map: Map) => void
   initialView?: Partial<State>
   layers?: {
     id: number
     name: string
     type: 'nodes' | 'edges'
+    source: 'geoserver-tile' | 'geoserver-geojson' | 'custom'
     geoserverMapId: number
     layerId: string
   }[]
 }
 
-export function OpenLayersMap({ ref, initialView, layers }: OpenLayersProps) {
-  const mapContainerRef = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<Map | null>(null)
+export function OpenLayersMap({
+  ref,
+  onMapReady,
+  initialView,
+  layers,
+}: OpenLayersMapProps) {
+  const vectorLayerRef = useRef<MapboxVectorLayer | null>(null)
+  const { styleUrl } = useMapStyle()
 
   const [view] = useState<Partial<State>>(
     () =>
@@ -42,71 +60,74 @@ export function OpenLayersMap({ ref, initialView, layers }: OpenLayersProps) {
       },
   )
 
-  const vectorLayerRef = useRef<MapboxVectorLayer | null>(null)
+  const [map, setMap] = useState<Map | null>(null)
+  const mapRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node) return
+      const vectorLayer = new MapboxVectorLayer({
+        styleUrl,
+        accessToken,
+      })
+      vectorLayerRef.current = vectorLayer
 
-  const { styleUrl } = useMapStyle()
+      const olMap = new Map({
+        target: node,
+        layers: [vectorLayer],
+        view: new View({
+          projection: 'EPSG:3857',
+          ...view,
+        }),
+        controls: [],
+      })
 
-  const createMap = useCallback(() => {
-    const vectorLayer = new MapboxVectorLayer({
-      styleUrl,
-      accessToken,
-    })
-    vectorLayerRef.current = vectorLayer
+      setMap(olMap)
+      onMapReady?.(olMap)
 
-    return new Map({
-      target: mapContainerRef.current!,
-      layers: [vectorLayer],
-      view: new View({
-        projection: 'EPSG:3857',
-        ...view,
-      }),
-      controls: [],
-    })
-
-    // Should only run once on mount, dependencies are managed in the useEffect
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Initialize the map on component mount
-  useEffect(() => {
-    if (!mapContainerRef.current) return
-
-    const map = createMap()
-    mapRef.current = map
-
-    if (typeof ref === 'function') {
-      ref(map)
-    } else if (ref) {
-      ref.current = map
-    }
-
-    return () => {
-      map.setTarget(undefined)
-
-      if (typeof ref === 'function') {
-        ref(null)
-      } else if (ref) {
-        ref.current = null
+      return () => {
+        olMap.setTarget(undefined)
+        setMap(null)
       }
-    }
-  }, [createMap, ref])
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
 
-  const geoserverTileLayer = (layers: string) =>
-    new TileLayer({
-      source: new TileWMS({
-        url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
-        params: { layers, tiled: true },
-        serverType: 'geoserver',
-      }),
-    })
+  useImperativeHandle(ref, () => {
+    return {
+      addLayer: (layer) => map?.addLayer(layer),
+      getMap: () => map,
+    }
+  }, [map])
+
+  // const geoserverTileLayer = (layers: string) =>
+  //   new TileLayer({
+  //     source: new TileWMS({
+  //       url: 'https://geoserver.scenwise.nl/geoserver/scenwise/wms',
+  //       params: { layers, tiled: true },
+  //       serverType: 'geoserver',
+  //     }),
+  //   })
+
+  // const tileLayers = layers?.map((layer) =>
+  //   useMapLayer(
+  //     mapRef,
+  //     geoserverTileLayer(layer.layerId),
+  //     {
+  //       id: String(layer.id),
+  //       type: layer.type === 'edges' ? 'edge' : 'node',
+  //       defaultEnabled: true,
+  //     },
+  //     [layer.layerId],
+  //   ),
+  // )
 
   // const edgeLayerId = useMemo(
   //   () => layers?.find((layer) => layer.type === 'edges')?.layerId,
   //   [layers],
   // )
-  // const edgeLayer = useMapLayer(mapRef, geoserverTileLayer(edgeLayerId ?? ''), {
+  // useMapLayer(mapRef, geoserverTileLayer(edgeLayerId ?? ''), {
   //   id: edgeLayerId ?? '',
-  //   type: 'edge',
+  //   type: 'edges',
   //   defaultEnabled: true,
   // })
 
@@ -125,25 +146,39 @@ export function OpenLayersMap({ ref, initialView, layers }: OpenLayersProps) {
   //   [layers],
   // )
 
-  const customLayer = useCustomMapLayer(mapRef)
+  // const customLayer = useCustomMapLayer(mapRef)
+
+  const tileLayers = useMemo(() => {
+    if (!layers) return []
+
+    return layers.filter((layer) => layer.source === 'geoserver-tile')
+  }, [layers])
+
+  const customLayers = useMemo(() => {
+    if (!layers) return []
+
+    return layers.filter((layer) => layer.source === 'custom')
+  }, [layers])
 
   return (
     <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10 @container">
-      <div className="w-full h-full" ref={mapContainerRef} />
+      <div className="w-full h-full" ref={mapRef} />
 
-      <ZoomControl
-        className="self-start place-self-end mt-3 mr-3"
-        mapRef={mapRef}
-      />
+      <ZoomControl className="self-start place-self-end mt-3 mr-3" map={map} />
 
       <div className="flex gap-3 self-end place-self-end mb-3 mr-3">
-        <StyleControl mapRef={mapRef} />
+        <StyleControl map={map} />
 
-        <LayersControl
-          mapRef={mapRef}
-          mapLayers={[/*edgeLayer, nodeLayer,*/ customLayer]}
-        />
+        <LayersControl map={map} />
       </div>
+
+      {tileLayers.map((layer) => (
+        <GeoserverTileLayer map={map} layer={layer} key={layer.id} />
+      ))}
+
+      {customLayers.map((layer) => (
+        <CustomLayer map={map} key={layer.id} />
+      ))}
     </div>
   )
 }

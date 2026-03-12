@@ -13,7 +13,7 @@ import {
   PageHeaderTitle,
 } from '@/components/page/page-header'
 import { useEffect, useRef, useState } from 'react'
-import { Feature, Map } from 'ol'
+import { Feature, Map, MapBrowserEvent } from 'ol'
 import VectorSource from 'ol/source/Vector'
 import VectorLayer from 'ol/layer/Vector'
 import { Icon, Style } from 'ol/style'
@@ -35,7 +35,7 @@ export function StreetviewClientPage({
 
   const [position, setPosition] = useState<Coordinate>()
 
-  const mapRef = useRef<Map | null>(null)
+  const [mapRef, setMap] = useState<Map | null>(null)
   const clickSource = useRef<VectorSource>(new VectorSource())
 
   function initializeStreetViewLayer() {
@@ -52,7 +52,7 @@ export function StreetviewClientPage({
         }),
     })
 
-    mapRef.current!.addLayer(clickLayer)
+    mapRef?.addLayer(clickLayer)
   }
 
   function updatePosition(position: Coordinate, heading = 0) {
@@ -63,20 +63,24 @@ export function StreetviewClientPage({
     clickSource.current.addFeature(feature)
 
     // Keep the map centered on the new position
-    mapRef.current!.getView().animate({
+    mapRef?.getView().animate({
       center: position,
       duration: 100,
     })
   }
 
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!mapRef) return
 
     initializeStreetViewLayer()
 
-    mapRef.current.on('click', (evt) => {
+    const handler = (evt: MapBrowserEvent) => {
+      console.log('Map clicked at', evt.coordinate)
       updatePosition(evt.coordinate)
-    })
+    }
+
+    mapRef.on('click', handler)
+    return () => mapRef.un('click', handler)
   }, [mapRef])
 
   return (
@@ -105,7 +109,7 @@ export function StreetviewClientPage({
             swappedLayout ? 'col-[3/4] row-[1/2]' : 'col-[1/3] row-[1/3]'
           }
         >
-          <OpenLayersMap ref={mapRef} layers={map?.layers} />
+          <OpenLayersMap onMapReady={setMap} layers={map?.layers} />
         </MapContainer>
 
         <StreetviewContainer

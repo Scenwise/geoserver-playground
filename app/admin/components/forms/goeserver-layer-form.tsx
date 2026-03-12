@@ -19,7 +19,7 @@ import {
   FieldSet,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { geoserverMapLayers } from '@/lib/db/schema/geoserver'
+import { geoserverMapLayers, layerSourceEnum } from '@/lib/db/schema/geoserver'
 import { createInsertSchema } from 'drizzle-orm/zod'
 import { Controller, useForm } from 'react-hook-form'
 import {
@@ -42,6 +42,7 @@ export function GeoserverLayerForm({
   data = {
     geoserverMapId: '' as unknown as number,
     layerId: '',
+    source: 'geoserver-tile',
     name: '',
     type: 'nodes',
   },
@@ -101,6 +102,38 @@ export function GeoserverLayerForm({
                     aria-invalid={fieldState.invalid}
                   />
                 </Field>
+              )}
+            />
+
+            <Controller
+              name="source"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <FieldSet data-invalid={!!fieldState.invalid}>
+                  <FieldLegend>Source</FieldLegend>
+
+                  <RadioGroup
+                    id="geoserver-layer-form-source"
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    aria-invalid={fieldState.invalid}
+                    className="grid grid-cols-2 gap-4"
+                  >
+                    {layerSourceEnum.enumValues.map((source) => (
+                      <Field key={source} orientation="horizontal">
+                        <RadioGroupItem
+                          value={source}
+                          id={`source-${source}`}
+                          aria-invalid={fieldState.invalid}
+                        />
+                        <FieldLabel htmlFor={`source-${source}`}>
+                          {source}
+                        </FieldLabel>
+                      </Field>
+                    ))}
+                  </RadioGroup>
+                </FieldSet>
               )}
             />
 

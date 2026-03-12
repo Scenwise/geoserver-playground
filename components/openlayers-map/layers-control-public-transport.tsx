@@ -5,18 +5,14 @@ import { Switch } from '../ui/switch'
 import { usePublicTransportLayer } from '@/hooks/use-public-transport-layer'
 import { Map } from 'ol'
 
-export function LayersControlPublicTransport({
-  mapRef,
-}: {
-  mapRef: React.RefObject<Map | null>
-}) {
+export function LayersControlPublicTransport({ map }: { map: Map | null }) {
   const {
     enabled: publicTransportEnabled,
     toggle: togglePublicTransport,
     isLoading,
     error,
     data,
-  } = usePublicTransportLayer(mapRef)
+  } = usePublicTransportLayer(map)
 
   return (
     <DropdownMenuItem onSelect={togglePublicTransport}>

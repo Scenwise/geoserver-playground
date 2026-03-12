@@ -13,11 +13,11 @@ import { useCustomMapLayer } from '@/hooks/use-custom-map-layer'
 export type MapLayer = ReturnType<typeof useMapLayer | typeof useCustomMapLayer>
 
 export function LayersControlMain({
-  mapRef,
+  map,
   mapLayers,
   setSelected,
 }: {
-  mapRef: React.RefObject<Map | null>
+  map: Map | null
   mapLayers?: MapLayer[]
   setSelected: (selected: string | null) => void
 }) {
@@ -31,7 +31,11 @@ export function LayersControlMain({
           onSelect={() => setSelected(layer.metadata?.id ?? null)}
           className={layer.enabled ? '' : 'line-through text-muted-foreground'}
         >
-          {layer.metadata?.type === 'edge' ? <SplineIcon /> : <GitCommitIcon />}
+          {layer.metadata?.type === 'edges' ? (
+            <SplineIcon />
+          ) : (
+            <GitCommitIcon />
+          )}
 
           <span className={cn('first-letter:capitalize grow')}>
             {layer.metadata?.type}s
@@ -49,7 +53,7 @@ export function LayersControlMain({
 
       <DropdownMenuLabel>Additional layers</DropdownMenuLabel>
 
-      <LayersControlPublicTransport mapRef={mapRef} />
+      <LayersControlPublicTransport map={map} />
     </>
   )
 }

@@ -7,7 +7,7 @@ import { transform } from 'ol/proj'
 import VectorSource from 'ol/source/Vector'
 import { Fill, Stroke, Style } from 'ol/style'
 import CircleStyle from 'ol/style/Circle'
-import { RefObject, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useSWRImmutable from 'swr/immutable'
 
 // TODO: this bbox should ideally come from the geoserver layer's native bounding box
@@ -21,7 +21,7 @@ const nativeBoundingBox = {
 
 const bbox = `${nativeBoundingBox.miny},${nativeBoundingBox.minx},${nativeBoundingBox.maxy},${nativeBoundingBox.maxx}`
 
-export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
+export function usePublicTransportLayer(map: Map | null) {
   const [enabled, setEnabled] = useState(false)
 
   const { data, error, isLoading } = useSWRImmutable(
@@ -55,9 +55,8 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
 
   // Initialize the vector source and layer when the component mounts
   useEffect(() => {
-    if (!mapRef.current || !enabled) return
+    if (!map || !enabled) return
 
-    const map = mapRef.current
     const layer = layerRef.current
 
     layer.setSource(sourceRef.current)
@@ -77,7 +76,7 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
       map.removeLayer(layer)
       map.removeOverlay(overlayRef.current!)
     }
-  }, [mapRef, enabled])
+  }, [map, enabled])
 
   // Update the vector source with new features when data is fetched
   useEffect(() => {
@@ -107,8 +106,7 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
   )
 
   useEffect(() => {
-    if (!mapRef.current || !enabled) return
-    const map = mapRef.current
+    if (!map || !enabled) return
 
     const handler = (event: MapBrowserEvent) => {
       const feature = map.forEachFeatureAtPixel(
@@ -136,7 +134,7 @@ export function usePublicTransportLayer(mapRef: RefObject<Map | null>) {
     return () => {
       map.un('singleclick', handler)
     }
-  }, [mapRef, enabled])
+  }, [map, enabled])
 
   const popup = (
     <div ref={popupRef}>

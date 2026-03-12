@@ -3,7 +3,7 @@ import {
   OpenLayersMap,
 } from '@/components/openlayers-map/openlayers-map'
 import { ResizablePanel } from '@/components/ui/resizable'
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Map } from 'ol'
 import { State } from 'ol/View'
@@ -14,27 +14,31 @@ export function CompareMap({
   view,
   onViewChange,
 }: {
-  map: Awaited<ReturnType<typeof getGeoserverMapById>> | null
+  map: Awaited<ReturnType<typeof getGeoserverMapById>>
   view?: Partial<State>
-  onViewChange?: (view: State) => void
+  onViewChange: (view: State) => void
 }) {
-  const mapRef = useRef<Map | null>(null)
+  // const mapRef = useRef<Map | null>(null)
+  const [mapRef, setMap] = useState<Map | null>(null)
 
   // Register view change listener
   useEffect(() => {
-    if (!mapRef.current || !onViewChange) return
+    if (!mapRef) return
 
-    mapRef.current.on('moveend', () => {
-      const view = mapRef.current?.getView()
-      if (view) onViewChange?.(view.getState())
-    })
-  }, [onViewChange])
+    const handler = () => {
+      const view = mapRef.getView()
+      if (view) onViewChange(view.getState())
+    }
+
+    mapRef.on('moveend', handler)
+    return () => mapRef.un('moveend', handler)
+  }, [mapRef, onViewChange])
 
   // Update the map view state
   useEffect(() => {
-    if (!mapRef.current || !view) return
+    if (!mapRef || !view) return
 
-    const mapView = mapRef.current.getView()
+    const mapView = mapRef.getView()
 
     const currentZoom = mapView.getZoom()
     const targetZoom = view.zoom !== currentZoom ? view.zoom : undefined
@@ -59,7 +63,7 @@ export function CompareMap({
         duration: 100,
       })
     }
-  }, [view])
+  }, [view, mapRef])
 
   return (
     <ResizablePanel
@@ -71,7 +75,7 @@ export function CompareMap({
         <OpenLayersMap
           key={`map-${map?.id}`}
           layers={map?.layers}
-          ref={mapRef}
+          onMapReady={setMap}
         />
       </MapContainer>
     </ResizablePanel>

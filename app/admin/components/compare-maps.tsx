@@ -1,17 +1,17 @@
 'use client'
 
 import { ResizablePanelGroup, ResizableHandle } from '@/components/ui/resizable'
-import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { CompareMap } from './compare-map'
 import { useState } from 'react'
 import { State } from 'ol/View'
+import { getGeoserverMapById } from '../actions/geoserver-map'
 
 export function CompareMaps({
   map1,
   map2,
 }: {
-  map1: typeof geoserverMaps.$inferSelect | null
-  map2: typeof geoserverMaps.$inferSelect | null
+  map1: Awaited<ReturnType<typeof getGeoserverMapById>>
+  map2: Awaited<ReturnType<typeof getGeoserverMapById>>
 }) {
   const [view, setView] = useState<Partial<State>>({
     center: [497598, 6785131],

@@ -2,7 +2,7 @@ import { Map } from 'ol'
 import { Layer } from 'ol/layer'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
-import { RefObject, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import GeoJSON from 'ol/format/GeoJSON'
 import { fetcher } from '@/lib/fetcher'
 import useSWR from 'swr'
@@ -11,9 +11,9 @@ import useSWR from 'swr'
  * Custom hook to manage the visibility of a map layer in an OpenLayers map.
  */
 export function useMapLayer(
-  mapRef: RefObject<Map | null>,
+  map: Map | null,
   layer: Layer,
-  metadata?: { id: string; type: 'node' | 'edge'; defaultEnabled?: boolean },
+  metadata?: { id: string; type: 'nodes' | 'edges'; defaultEnabled?: boolean },
 ) {
   const [enabled, setEnabled] = useState(metadata?.defaultEnabled ?? false)
   const [opacity, setOpacity] = useState(1)
@@ -21,9 +21,8 @@ export function useMapLayer(
 
   // Initialize the layer when the component mounts
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!map) return
 
-    const map = mapRef.current
     const layer = layerRef.current
 
     map.addLayer(layer)
@@ -31,7 +30,7 @@ export function useMapLayer(
     return () => {
       map.removeLayer(layer)
     }
-  }, [mapRef])
+  }, [map])
 
   useEffect(() => {
     layerRef.current.setVisible(enabled)
@@ -51,13 +50,13 @@ export function useMapLayer(
 }
 
 export function useGeoJSONLayer(
-  mapRef: RefObject<Map | null>,
+  map: Map | null,
   layer: VectorLayer,
-  metadata?: { id: string; type: 'node' | 'edge'; defaultEnabled?: boolean },
+  metadata?: { id: string; type: 'nodes' | 'edges'; defaultEnabled?: boolean },
 ) {
   const sourceRef = useRef<VectorSource>(new VectorSource())
 
-  const mapLayer = useMapLayer(mapRef, layer, metadata)
+  const mapLayer = useMapLayer(map, layer, metadata)
   const { enabled } = mapLayer
 
   const { data } = useSWR(

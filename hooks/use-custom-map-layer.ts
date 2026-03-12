@@ -1,13 +1,13 @@
 import GeoJSON from 'ol/format/GeoJSON'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
-import { RefObject, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useMapLayer } from './use-map-layer'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/fetcher'
 import { Map } from 'ol'
 
-export function useCustomMapLayer(mapRef: RefObject<Map | null>) {
+export function useCustomMapLayer(map: Map | null) {
   const sourceRef = useRef<VectorSource>(new VectorSource())
 
   const layer = useMemo(
@@ -21,9 +21,9 @@ export function useCustomMapLayer(mapRef: RefObject<Map | null>) {
     [],
   )
 
-  const mapLayer = useMapLayer(mapRef, layer, {
+  const mapLayer = useMapLayer(map, layer, {
     id: 'custom',
-    type: 'edge',
+    type: 'edges',
     defaultEnabled: true,
   })
   const { enabled } = mapLayer

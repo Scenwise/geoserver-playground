@@ -17,17 +17,17 @@ import { LayersControlSecondary } from './layers-control-secondary'
 export type MapLayer = ReturnType<typeof useMapLayer>
 
 export function LayersControl({
-  mapRef,
+  map,
   className,
   mapLayers,
 }: {
-  mapRef: React.RefObject<Map | null>
+  map: Map | null
   className?: string
   mapLayers?: MapLayer[]
 }) {
   const [open, setOpen] = useState(false)
 
-  const { popup } = usePublicTransportLayer(mapRef)
+  const { popup } = usePublicTransportLayer(map)
 
   const [selected, setSelected] = useState<string | null>(null)
   const mapLayer = useMemo(() => {
@@ -71,7 +71,7 @@ export function LayersControl({
                 />
               ) : (
                 <LayersControlMain
-                  mapRef={mapRef}
+                  map={map}
                   mapLayers={mapLayers}
                   setSelected={setSelected}
                 />

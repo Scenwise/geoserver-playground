@@ -5,16 +5,16 @@ import { MinusIcon, PlusIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function ZoomControl({
-  mapRef,
+  map,
   className,
 }: {
-  mapRef: React.RefObject<Map | null>
+  map: Map | null
   className?: string
 }) {
   function zoom(value: number) {
-    if (!mapRef.current) return
+    if (!map) return
 
-    const view = mapRef.current.getView()
+    const view = map.getView()
     view.animate({ zoom: view.getZoom()! + value, duration: 100 })
   }
 
