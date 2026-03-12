@@ -20,7 +20,7 @@ import {
   UpsertGeoserverMap,
   updateGeoServerMap,
   insertGeoServerMap,
-} from '../actions/geoserver-map'
+} from '../../actions/geoserver-map'
 import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
 import { Spinner } from '@/components/ui/spinner'
@@ -37,8 +37,6 @@ export function GeoserverMapForm({
     name: '',
     version: '' as unknown as number,
     description: '',
-    geoserverEdges: '',
-    geoserverNodes: '',
   },
   children,
 }: GeoserverMapFormProps) {
@@ -76,45 +74,47 @@ export function GeoserverMapForm({
           <AlertDialogHeader>
             <AlertDialogTitle>{label} map</AlertDialogTitle>
             <AlertDialogDescription>
-              Make changes to your map here. Click save when you&apos;re done.
+              Make changes to the map metadata.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <FieldGroup>
-            <Controller
-              name="name"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={!!fieldState.invalid}>
-                  <FieldLabel htmlFor="geoserver-map-form-name">
-                    Name
-                  </FieldLabel>
-                  <Input
-                    id="geoserver-map-form-name"
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                  />
-                </Field>
-              )}
-            />
+            <FieldGroup className="flex-row">
+              <Controller
+                name="name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={!!fieldState.invalid}>
+                    <FieldLabel htmlFor="geoserver-map-form-name">
+                      Name
+                    </FieldLabel>
+                    <Input
+                      id="geoserver-map-form-name"
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                    />
+                  </Field>
+                )}
+              />
 
-            <Controller
-              name="version"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={!!fieldState.invalid}>
-                  <FieldLabel htmlFor="geoserver-map-form-version">
-                    Version number
-                  </FieldLabel>
-                  <Input
-                    id="geoserver-map-form-version"
-                    type="number"
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                  />
-                </Field>
-              )}
-            />
+              <Controller
+                name="version"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={!!fieldState.invalid}>
+                    <FieldLabel htmlFor="geoserver-map-form-version">
+                      Version number
+                    </FieldLabel>
+                    <Input
+                      id="geoserver-map-form-version"
+                      type="number"
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                    />
+                  </Field>
+                )}
+              />
+            </FieldGroup>
 
             <Controller
               name="description"
@@ -127,40 +127,6 @@ export function GeoserverMapForm({
                   <Textarea
                     {...field}
                     id="geoserver-map-form-description"
-                    aria-invalid={fieldState.invalid}
-                  />
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="geoserverEdges"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={!!fieldState.invalid}>
-                  <FieldLabel htmlFor="geoserver-map-form-edges">
-                    Geoserver edges
-                  </FieldLabel>
-                  <Input
-                    id="geoserver-map-form-edges"
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                  />
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="geoserverNodes"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={!!fieldState.invalid}>
-                  <FieldLabel htmlFor="geoserver-map-form-nodes">
-                    Geoserver nodes
-                  </FieldLabel>
-                  <Input
-                    id="geoserver-map-form-nodes"
-                    {...field}
                     aria-invalid={fieldState.invalid}
                   />
                 </Field>

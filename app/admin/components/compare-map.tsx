@@ -3,18 +3,18 @@ import {
   OpenLayersMap,
 } from '@/components/openlayers-map/openlayers-map'
 import { ResizablePanel } from '@/components/ui/resizable'
-import { geoserverMaps } from '@/lib/db/schema/geoserver'
 import { useEffect, useRef } from 'react'
 
 import { Map } from 'ol'
 import { State } from 'ol/View'
+import { getGeoserverMapById } from '../actions/geoserver-map'
 
 export function CompareMap({
   map,
   view,
   onViewChange,
 }: {
-  map: typeof geoserverMaps.$inferSelect | null
+  map: Awaited<ReturnType<typeof getGeoserverMapById>> | null
   view?: Partial<State>
   onViewChange?: (view: State) => void
 }) {
@@ -70,8 +70,7 @@ export function CompareMap({
       <MapContainer className="grow">
         <OpenLayersMap
           key={`map-${map?.id}`}
-          edgeLayerId={map?.geoserverEdges}
-          nodeLayerId={map?.geoserverNodes}
+          layers={map?.layers}
           ref={mapRef}
         />
       </MapContainer>

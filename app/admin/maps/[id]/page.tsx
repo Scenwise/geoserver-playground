@@ -4,11 +4,16 @@ import {
   OpenLayersMap,
   MapContainer,
 } from '@/components/openlayers-map/openlayers-map'
-import { GeoserverMapForm } from '../../components/goeserver-map-form'
+import { GeoserverMapForm } from '../../components/forms/goeserver-map-form'
 import { FeatureCountBadge } from '../../components/feature-count-badge'
 import { Button } from '@/components/ui/button'
 import { GeoserverMapMainButton } from '../../components/geoserver-map-main-button'
-import { ChevronsLeftRightIcon, PenIcon, StarIcon } from 'lucide-react'
+import {
+  ChevronsLeftRightIcon,
+  PenIcon,
+  PlusIcon,
+  StarIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { ColoredBadge } from '@/components/colored-badge'
 import { PageContainer, PageContent } from '@/components/page/page-container'
@@ -26,6 +31,7 @@ import {
 } from '@/components/ui/tooltip'
 import { getGeoserverMapById } from '../../actions/geoserver-map'
 import { notFound } from 'next/navigation'
+import { GeoserverLayerForm } from '@/admin/components/forms/goeserver-layer-form'
 
 export default async function MapPage({
   params,
@@ -86,23 +92,32 @@ export default async function MapPage({
         </PageHeaderActions>
       </PageHeader>
 
-      <PageContent className="flex gap-4">
-        <FeatureCountBadge
-          id={geoserverMap?.geoserverNodes || ''}
-          type="nodes"
-        />
-        <FeatureCountBadge
-          id={geoserverMap?.geoserverEdges || ''}
-          type="edges"
-        />
+      <PageContent className="space-y-2">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          Layers
+          {/* <GeoserverLayerForm data={{ geoserverMapId: geoserverMap.id }}>
+            <Button variant="secondary" size="sm">
+              <PlusIcon />
+              Add layer
+            </Button>
+          </GeoserverLayerForm> */}
+        </h3>
+        {geoserverMap.layers.length > 0 && (
+          <div className="flex gap-4">
+            {geoserverMap?.layers?.map((layer) => (
+              <FeatureCountBadge
+                key={layer.id}
+                id={layer.layerId}
+                type={layer.type}
+              />
+            ))}
+          </div>
+        )}
       </PageContent>
 
       <PageContent className="grow flex">
         <MapContainer>
-          <OpenLayersMap
-            edgeLayerId={geoserverMap.geoserverEdges}
-            nodeLayerId={geoserverMap.geoserverNodes}
-          />
+          <OpenLayersMap layers={geoserverMap.layers} />
         </MapContainer>
       </PageContent>
     </PageContainer>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useState, Ref, useCallback } from 'react'
+import { useRef, useEffect, useState, Ref, useCallback, useMemo } from 'react'
 
 import 'ol/ol.css'
 import { Map, View } from 'ol'
@@ -20,16 +20,16 @@ const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 interface OpenLayersProps {
   ref?: Ref<Map>
   initialView?: Partial<State>
-  edgeLayerId?: string
-  nodeLayerId?: string
+  layers?: {
+    id: number
+    name: string
+    type: 'nodes' | 'edges'
+    geoserverMapId: number
+    layerId: string
+  }[]
 }
 
-export function OpenLayersMap({
-  ref,
-  initialView,
-  edgeLayerId,
-  nodeLayerId,
-}: OpenLayersProps) {
+export function OpenLayersMap({ ref, initialView, layers }: OpenLayersProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<Map | null>(null)
 
@@ -99,12 +99,20 @@ export function OpenLayersMap({
       }),
     })
 
+  const edgeLayerId = useMemo(
+    () => layers?.find((layer) => layer.type === 'edges')?.layerId,
+    [layers],
+  )
   const edgeLayer = useMapLayer(mapRef, geoserverTileLayer(edgeLayerId ?? ''), {
     id: edgeLayerId ?? '',
     type: 'edge',
     defaultEnabled: true,
   })
 
+  const nodeLayerId = useMemo(
+    () => layers?.find((layer) => layer.type === 'nodes')?.layerId,
+    [layers],
+  )
   const nodeLayer = useMapLayer(mapRef, geoserverTileLayer(nodeLayerId ?? ''), {
     id: nodeLayerId ?? '',
     type: 'node',

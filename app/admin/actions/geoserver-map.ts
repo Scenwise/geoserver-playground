@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { geoserverMaps } from '@/lib/db/schema/geoserver'
+import { geoserverMapLayers, geoserverMaps } from '@/lib/db/schema/geoserver'
 import { eq } from 'drizzle-orm'
 import { createInsertSchema, createUpdateSchema } from 'drizzle-orm/zod'
 import z from 'zod'
@@ -28,6 +28,7 @@ export const getGeoserverMapById = cache(async (id: number) => {
   try {
     const data = await db.query.geoserverMaps.findFirst({
       where: { id },
+      with: { layers: true },
     })
     return data ?? null
   } catch (error) {
@@ -42,6 +43,7 @@ export const getMainGeoserverMap = cache(async () => {
   try {
     const data = await db.query.geoserverMaps.findFirst({
       where: { isMain: true },
+      with: { layers: true },
     })
     return data ?? null
   } catch (error) {
@@ -49,6 +51,21 @@ export const getMainGeoserverMap = cache(async () => {
     return null
   }
 })
+
+export const setGeoServerMapMain = async (id: number) => {
+  await verifySession()
+
+  await db
+    .update(geoserverMaps)
+    .set({ isMain: null })
+    .where(eq(geoserverMaps.isMain, true))
+  await db
+    .update(geoserverMaps)
+    .set({ isMain: true })
+    .where(eq(geoserverMaps.id, id))
+
+  refresh()
+}
 
 export type UpsertGeoserverMap =
   | typeof geoserverMaps.$inferSelect
@@ -77,17 +94,32 @@ export const updateGeoServerMap = async (
   refresh()
 }
 
-export const setGeoServerMapMain = async (id: number) => {
+export type UpsertGeoserverLayer =
+  | typeof geoserverMapLayers.$inferSelect
+  | typeof geoserverMapLayers.$inferInsert
+
+const _geoserverLayerInsertSchema = createInsertSchema(geoserverMapLayers)
+export const insertGeoServerLayer = async (
+  data: z.infer<typeof _geoserverLayerInsertSchema>,
+) => {
+  await verifySession()
+
+  await db.insert(geoserverMapLayers).values(data)
+
+  refresh()
+}
+
+const _geoserverLayerUpdateSchema = createUpdateSchema(geoserverMapLayers)
+export const updateGeoServerLayer = async (
+  id: number,
+  data: z.infer<typeof _geoserverLayerUpdateSchema>,
+) => {
   await verifySession()
 
   await db
-    .update(geoserverMaps)
-    .set({ isMain: null })
-    .where(eq(geoserverMaps.isMain, true))
-  await db
-    .update(geoserverMaps)
-    .set({ isMain: true })
-    .where(eq(geoserverMaps.id, id))
+    .update(geoserverMapLayers)
+    .set(data)
+    .where(eq(geoserverMapLayers.id, id))
 
   refresh()
 }

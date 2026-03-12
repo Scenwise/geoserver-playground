@@ -1,7 +1,5 @@
 'use client'
 
-import { geoserverMaps } from '@/lib/db/schema/geoserver'
-
 import {
   OpenLayersMap,
   MapContainer,
@@ -26,11 +24,12 @@ import { Button } from '@/components/ui/button'
 import { RefreshCcwIcon } from 'lucide-react'
 import { tools } from '@/admin/data/admin-sidebar'
 import { StreetviewContainer } from '../components/streetview-container'
+import { getMainGeoserverMap } from '../actions/geoserver-map'
 
 export function StreetviewClientPage({
   map,
 }: {
-  map: typeof geoserverMaps.$inferSelect | null
+  map: Awaited<ReturnType<typeof getMainGeoserverMap>>
 }) {
   const [swappedLayout, setSwappedLayout] = useState(false)
 
@@ -106,11 +105,7 @@ export function StreetviewClientPage({
             swappedLayout ? 'col-[3/4] row-[1/2]' : 'col-[1/3] row-[1/3]'
           }
         >
-          <OpenLayersMap
-            ref={mapRef}
-            nodeLayerId={map?.geoserverNodes}
-            edgeLayerId={map?.geoserverEdges}
-          />
+          <OpenLayersMap ref={mapRef} layers={map?.layers} />
         </MapContainer>
 
         <StreetviewContainer
