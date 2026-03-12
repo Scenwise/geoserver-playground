@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import {
   Field,
+  FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldLegend,
@@ -41,10 +42,11 @@ interface GeoserverLayerFormProps {
 export function GeoserverLayerForm({
   data = {
     geoserverMapId: '' as unknown as number,
-    layerId: '',
-    source: 'geoserver-tile',
     name: '',
+    source: 'geoserver-tile',
+    layerId: '',
     type: 'nodes',
+    order: '' as unknown as number,
   },
   children,
 }: GeoserverLayerFormProps) {
@@ -52,11 +54,12 @@ export function GeoserverLayerForm({
 
   const formSchema = createInsertSchema(geoserverMapLayers, {
     geoserverMapId: z.coerce.number<number>().int().positive(),
+    order: z.coerce.number<number>().int().positive(),
   })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: data,
+    defaultValues: { ...data, order: 0 },
   })
 
   async function onSubmit(formData: z.infer<typeof formSchema>) {
@@ -85,135 +88,162 @@ export function GeoserverLayerForm({
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <FieldGroup>
-            <Controller
-              name="geoserverMapId"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={!!fieldState.invalid}>
-                  <FieldLabel htmlFor="geoserver-layer-form-geoserverMapId">
-                    GeoServer Map ID
-                  </FieldLabel>
-                  <Input
-                    disabled
-                    id="geoserver-layer-form-geoserverMapId"
-                    type="number"
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                  />
-                </Field>
-              )}
-            />
+          <div className="-mx-4 max-h-[50vh] overflow-y-auto px-4 -mb-4 pb-4">
+            <FieldGroup>
+              <Controller
+                name="geoserverMapId"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={!!fieldState.invalid}>
+                    <FieldLabel htmlFor="geoserver-layer-form-geoserverMapId">
+                      GeoServer Map ID
+                    </FieldLabel>
+                    <Input
+                      disabled
+                      id="geoserver-layer-form-geoserverMapId"
+                      type="number"
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                    />
+                  </Field>
+                )}
+              />
 
-            <Controller
-              name="source"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <FieldSet data-invalid={!!fieldState.invalid}>
-                  <FieldLegend>Source</FieldLegend>
+              <Controller
+                name="name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={!!fieldState.invalid}>
+                    <FieldLabel htmlFor="geoserver-layer-form-name">
+                      Name
+                    </FieldLabel>
+                    <Input
+                      id="geoserver-layer-form-name"
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                    />
+                  </Field>
+                )}
+              />
 
-                  <RadioGroup
-                    id="geoserver-layer-form-source"
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    aria-invalid={fieldState.invalid}
-                    className="grid grid-cols-2 gap-4"
-                  >
-                    {layerSourceEnum.enumValues.map((source) => (
-                      <Field key={source} orientation="horizontal">
+              <Controller
+                name="source"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FieldSet data-invalid={!!fieldState.invalid}>
+                    <FieldLegend>Source</FieldLegend>
+
+                    <RadioGroup
+                      id="geoserver-layer-form-source"
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      aria-invalid={fieldState.invalid}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      {layerSourceEnum.enumValues.map((source) => (
+                        <Field key={source} orientation="horizontal">
+                          <RadioGroupItem
+                            value={source}
+                            id={`source-${source}`}
+                            aria-invalid={fieldState.invalid}
+                          />
+                          <FieldLabel htmlFor={`source-${source}`}>
+                            {source}
+                          </FieldLabel>
+                        </Field>
+                      ))}
+                    </RadioGroup>
+                  </FieldSet>
+                )}
+              />
+
+              <Controller
+                name="layerId"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="geoserver-layer-form-layerId">
+                      Layer ID
+                    </FieldLabel>
+                    <FieldDescription>
+                      The name of the layer as defined in GeoServer.
+                    </FieldDescription>
+                    <Input
+                      id="geoserver-layer-form-layerId"
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                    />
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="type"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FieldSet data-invalid={!!fieldState.invalid}>
+                    <FieldLegend>Type</FieldLegend>
+
+                    <RadioGroup
+                      id="geoserver-layer-form-type"
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      aria-invalid={fieldState.invalid}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      <Field
+                        orientation="horizontal"
+                        data-invalid={fieldState.invalid}
+                      >
                         <RadioGroupItem
-                          value={source}
-                          id={`source-${source}`}
+                          value="nodes"
+                          id="type-nodes"
                           aria-invalid={fieldState.invalid}
                         />
-                        <FieldLabel htmlFor={`source-${source}`}>
-                          {source}
-                        </FieldLabel>
+                        <FieldLabel htmlFor="type-nodes">Nodes</FieldLabel>
                       </Field>
-                    ))}
-                  </RadioGroup>
-                </FieldSet>
-              )}
-            />
 
-            <Controller
-              name="layerId"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="geoserver-layer-form-layerId">
-                    Layer ID
-                  </FieldLabel>
-                  <Input
-                    id="geoserver-layer-form-layerId"
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                  />
-                </Field>
-              )}
-            />
+                      <Field
+                        orientation="horizontal"
+                        data-invalid={fieldState.invalid}
+                      >
+                        <RadioGroupItem
+                          value="edges"
+                          id="type-edges"
+                          aria-invalid={fieldState.invalid}
+                        />
+                        <FieldLabel htmlFor="type-edges">Edges</FieldLabel>
+                      </Field>
+                    </RadioGroup>
+                  </FieldSet>
+                )}
+              />
 
-            <Controller
-              name="name"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={!!fieldState.invalid}>
-                  <FieldLabel htmlFor="geoserver-layer-form-name">
-                    Name
-                  </FieldLabel>
-                  <Input
-                    id="geoserver-layer-form-name"
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                  />
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="type"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <FieldSet data-invalid={!!fieldState.invalid}>
-                  <FieldLegend>Type</FieldLegend>
-
-                  <RadioGroup
-                    id="geoserver-layer-form-type"
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    aria-invalid={fieldState.invalid}
-                    className="grid grid-cols-2 gap-4"
-                  >
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <RadioGroupItem
-                        value="nodes"
-                        id="type-nodes"
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor="type-nodes">Nodes</FieldLabel>
-                    </Field>
-
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <RadioGroupItem
-                        value="edges"
-                        id="type-edges"
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor="type-edges">Edges</FieldLabel>
-                    </Field>
-                  </RadioGroup>
-                </FieldSet>
-              )}
-            />
-          </FieldGroup>
+              <Controller
+                name="order"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={!!fieldState.invalid}>
+                    <FieldLabel htmlFor="geoserver-layer-form-order">
+                      Order
+                    </FieldLabel>
+                    <FieldDescription>
+                      The order in which the layer is rendered. Layers with a
+                      lower order are rendered below layers with a higher order.
+                    </FieldDescription>
+                    <Input
+                      id="geoserver-layer-form-order"
+                      type="number"
+                      {...field}
+                      aria-invalid={fieldState.invalid}
+                    />
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+          </div>
 
           <AlertDialogFooter>
             <AlertDialogCancel asChild>

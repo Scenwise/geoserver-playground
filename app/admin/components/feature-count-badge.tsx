@@ -10,23 +10,27 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { geoserverMapLayers } from '@/lib/db/schema/geoserver'
 import { safeJson } from '@/lib/safe-json'
-import { GitCommitIcon, SplineIcon, TriangleAlertIcon } from 'lucide-react'
+import {
+  GitCommitIcon,
+  PenIcon,
+  SplineIcon,
+  TriangleAlertIcon,
+} from 'lucide-react'
+import { GeoserverLayerForm } from './forms/goeserver-layer-form'
+import { Button } from '@/components/ui/button'
 
-export async function FeatureCountBadge({
-  id,
-  type,
-}: {
-  id: string
-  type: 'nodes' | 'edges'
-}) {
+type Layer = typeof geoserverMapLayers.$inferSelect
+
+export async function FeatureCountBadge({ layer }: { layer: Layer }) {
   const BadgeIcon = {
     nodes: GitCommitIcon,
     edges: SplineIcon,
-  }[type]
+  }[layer.type]
 
   const response = await fetch(
-    `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${id}&outputFormat=application/json&maxFeatures=0`,
+    `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${layer.layerId}&outputFormat=application/json&maxFeatures=0`,
   )
   const { json, error } = await safeJson(response)
 
@@ -45,19 +49,29 @@ export async function FeatureCountBadge({
         </Tooltip>
       </ItemMedia>
       <ItemContent>
-        <ItemTitle className="capitalize">{type}</ItemTitle>
-        <ItemDescription>{id}</ItemDescription>
+        <ItemTitle>{layer.name}</ItemTitle>
+        <ItemDescription>
+          Source: {layer.source}, type: {layer.type}
+        </ItemDescription>
       </ItemContent>
-      <ItemContent className="flex-none">
-        {isSuccess ? (
-          <ItemDescription>{json?.totalFeatures} features</ItemDescription>
-        ) : (
-          <ItemDescription className="text-destructive">
-            {!response.ok ? 'Could not load features' : 'Layer not found'}
-            <TriangleAlertIcon className="inline align-middle size-3 ml-1" />
-          </ItemDescription>
-        )}
-      </ItemContent>
+      {layer.source !== 'custom' && (
+        <ItemContent className="flex-none">
+          {isSuccess ? (
+            <ItemDescription>{json?.totalFeatures} features</ItemDescription>
+          ) : (
+            <ItemDescription className="text-destructive">
+              {!response.ok ? 'Could not load features' : 'Layer not found'}
+              <TriangleAlertIcon className="inline align-middle size-3 ml-1" />
+            </ItemDescription>
+          )}
+        </ItemContent>
+      )}
+
+      <GeoserverLayerForm data={layer}>
+        <Button variant="secondary">
+          <PenIcon />
+        </Button>
+      </GeoserverLayerForm>
     </Item>
   )
 }

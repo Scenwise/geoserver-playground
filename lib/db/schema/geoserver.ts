@@ -27,6 +27,7 @@ export const geoserverMapLayers = pgTable('geoserver_map_layers', {
   layerId: varchar({ length: 255 }).notNull(),
   name: varchar({ length: 255 }).notNull(),
   type: layerTypeEnum().notNull(),
+  order: integer(),
 })
 
 export const geoserverRelations = defineRelations(

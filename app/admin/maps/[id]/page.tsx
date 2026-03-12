@@ -105,11 +105,7 @@ export default async function MapPage({
         {geoserverMap.layers.length > 0 && (
           <div className="flex gap-4">
             {geoserverMap?.layers?.map((layer) => (
-              <FeatureCountBadge
-                key={layer.id}
-                id={layer.layerId}
-                type={layer.type}
-              />
+              <FeatureCountBadge key={layer.id} layer={layer} />
             ))}
           </div>
         )}

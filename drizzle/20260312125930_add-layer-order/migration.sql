@@ -1,0 +1,1 @@
+ALTER TABLE "geoserver_map_layers" ADD COLUMN "order" integer;

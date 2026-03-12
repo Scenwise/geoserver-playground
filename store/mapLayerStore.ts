@@ -9,8 +9,6 @@ export interface BaseLayerState {
 
 export interface GeoserverTileLayerState extends BaseLayerState {
   source: 'geoserver-tile'
-  // geoserverMapId: number
-  // layerId: string
 }
 
 export interface CustomLayerState extends BaseLayerState {
