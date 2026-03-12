@@ -12,7 +12,7 @@ import {
   PageHeaderDescription,
   PageHeaderTitle,
 } from '@/components/page/page-header'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Feature, Map, MapBrowserEvent } from 'ol'
 import VectorSource from 'ol/source/Vector'
 import VectorLayer from 'ol/layer/Vector'
@@ -38,7 +38,7 @@ export function StreetviewClientPage({
   const [mapRef, setMap] = useState<Map | null>(null)
   const clickSource = useRef<VectorSource>(new VectorSource())
 
-  function initializeStreetViewLayer() {
+  const initializeStreetViewLayer = useCallback(() => {
     const clickLayer = new VectorLayer({
       source: clickSource.current,
       style: (feature) =>
@@ -53,21 +53,24 @@ export function StreetviewClientPage({
     })
 
     mapRef?.addLayer(clickLayer)
-  }
+  }, [mapRef])
 
-  function updatePosition(position: Coordinate, heading = 0) {
-    setPosition(position)
+  const updatePosition = useCallback(
+    (position: Coordinate, heading = 0) => {
+      setPosition(position)
 
-    clickSource.current.clear()
-    const feature = new Feature({ geometry: new Point(position), heading })
-    clickSource.current.addFeature(feature)
+      clickSource.current.clear()
+      const feature = new Feature({ geometry: new Point(position), heading })
+      clickSource.current.addFeature(feature)
 
-    // Keep the map centered on the new position
-    mapRef?.getView().animate({
-      center: position,
-      duration: 100,
-    })
-  }
+      // Keep the map centered on the new position
+      mapRef?.getView().animate({
+        center: position,
+        duration: 100,
+      })
+    },
+    [mapRef],
+  )
 
   useEffect(() => {
     if (!mapRef) return
@@ -81,7 +84,7 @@ export function StreetviewClientPage({
 
     mapRef.on('click', handler)
     return () => mapRef.un('click', handler)
-  }, [mapRef])
+  }, [initializeStreetViewLayer, mapRef, updatePosition])
 
   return (
     <PageContainer className="max-h-screen">

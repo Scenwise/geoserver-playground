@@ -1,3 +1,5 @@
+'use client'
+
 import GeoJSON from 'ol/format/GeoJSON'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
@@ -8,6 +10,20 @@ import { fetcher } from '@/lib/fetcher'
 import { Map } from 'ol'
 import { useMapLayerStore } from '@/providers/MapLayerStoreProvider'
 import { GeoserverLayer } from '@/store/mapLayerStore'
+import Geometry from 'ol/geom/Geometry'
+
+type Feature = {
+  meta_data: {
+    len_nodes: number
+    feature_id: string
+    align_index: number
+  }
+  geometries: {
+    [key: string]: {
+      geometry: Geometry
+    }
+  }
+}
 
 export function useCustomMapLayer(
   map: Map | null,
@@ -44,7 +60,8 @@ export function useCustomMapLayer(
   const formattedFeatures = useMemo(() => {
     if (!data) return []
 
-    return Object.values(data.features).map((feature) => {
+    return Object.values(data.features).map((_feature) => {
+      const feature = _feature as Feature
       const clamped = clamp(
         alignIndex,
         feature.meta_data.align_index * -1,
