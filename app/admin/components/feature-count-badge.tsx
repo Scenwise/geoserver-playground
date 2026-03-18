@@ -30,7 +30,7 @@ export async function FeatureCountBadge({ layer }: { layer: Layer }) {
   }[layer.type]
 
   const response = await fetch(
-    `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${layer.layerId}&outputFormat=application/json&maxFeatures=0`,
+    `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${layer.layerId}&outputFormat=application/json&maxFeatures=1`,
   )
   const { json, error } = await safeJson(response)
 
