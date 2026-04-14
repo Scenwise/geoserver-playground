@@ -11,7 +11,11 @@ export function StreetviewContainer({
   className = '',
 }: {
   position?: Coordinate
-  onPositionChange: (position: Coordinate, heading: number) => void
+  onPositionChange: (
+    position: Coordinate,
+    heading: number,
+    zoom: number,
+  ) => void
   className?: string
 }) {
   const tabs = [

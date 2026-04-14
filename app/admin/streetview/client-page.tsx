@@ -33,7 +33,9 @@ export function StreetviewClientPage({
 }) {
   const [swappedLayout, setSwappedLayout] = useState(false)
 
-  const [position, setPosition] = useState<Coordinate>()
+  const [location, setLocation] = useState<
+    { position: Coordinate; heading: number; zoom: number } | undefined
+  >()
 
   const [mapRef, setMap] = useState<Map | null>(null)
   const clickSource = useRef<VectorSource>(new VectorSource())
@@ -55,9 +57,14 @@ export function StreetviewClientPage({
     mapRef?.addLayer(clickLayer)
   }, [mapRef])
 
+  const lastPosition = useRef<string>('')
   const updatePosition = useCallback(
-    (position: Coordinate, heading = 0) => {
-      setPosition(position)
+    (position: Coordinate, heading = 0, zoom = 1) => {
+      const key = `${position[0]},${position[1]},${heading},${zoom}`
+      if (key === lastPosition.current) return
+      lastPosition.current = key
+
+      setLocation({ position, heading, zoom })
 
       clickSource.current.clear()
       const feature = new Feature({ geometry: new Point(position), heading })
@@ -78,7 +85,6 @@ export function StreetviewClientPage({
     initializeStreetViewLayer()
 
     const handler = (evt: MapBrowserEvent) => {
-      console.log('Map clicked at', evt.coordinate)
       updatePosition(evt.coordinate)
     }
 
@@ -119,13 +125,15 @@ export function StreetviewClientPage({
           className={
             swappedLayout ? 'col-[1/3] row-[1/3]' : 'col-[3/4] row-[1/2]'
           }
-          position={position}
+          position={location?.position}
           onPositionChange={updatePosition}
         />
 
         <StreetviewSegmentation
           className="col-[3/4] row-[2/3]"
-          position={position}
+          position={location?.position}
+          heading={location?.heading ?? 0}
+          zoom={location?.zoom ?? 1}
         />
       </PageContent>
     </PageContainer>

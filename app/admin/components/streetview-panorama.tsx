@@ -9,7 +9,11 @@ export function StreetviewPanorama({
   onPositionChange,
 }: {
   position: Coordinate
-  onPositionChange: (position: Coordinate, heading: number) => void
+  onPositionChange: (
+    position: Coordinate,
+    heading: number,
+    zoom: number,
+  ) => void
 }) {
   const containerRef = useRef(null)
   const panoramaRef = useRef<google.maps.StreetViewPanorama>(null)
@@ -30,6 +34,9 @@ export function StreetviewPanorama({
     })
   }
 
+  const isProgrammaticUpdate = useRef(false)
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>(null)
+
   // Initialize Street View panorama when position is set
   useEffect(() => {
     if (panoramaRef.current || !position) return
@@ -40,14 +47,22 @@ export function StreetviewPanorama({
     if (!panorama) return
 
     const updatePanoramaPosition = () => {
+      if (isProgrammaticUpdate.current) return
       const position = panorama.getPosition()
       const pov = panorama.getPov()
-      if (!position || pov === undefined) return
-      onPositionChange(latLngToCoordinate(position), pov.heading)
+      const zoom = panorama.getZoom()
+      if (!position || pov === undefined || zoom === undefined) return
+
+      // wait until user stops moving
+      clearTimeout(debounceTimer.current!)
+      debounceTimer.current = setTimeout(() => {
+        onPositionChange(latLngToCoordinate(position), pov.heading, zoom)
+      }, 300)
     }
 
     panorama.addListener('position_changed', updatePanoramaPosition)
     panorama.addListener('pov_changed', updatePanoramaPosition)
+    panorama.addListener('zoom_changed', updatePanoramaPosition)
 
     panoramaRef.current = panorama
   }, [onPositionChange, position])
@@ -61,7 +76,11 @@ export function StreetviewPanorama({
     const currentPosition = panorama.getPosition()
 
     if (!currentPosition?.equals(targetPosition)) {
+      isProgrammaticUpdate.current = true
       panorama.setPosition(targetPosition)
+      setTimeout(() => {
+        isProgrammaticUpdate.current = false
+      }, 500)
     }
   }, [position])
 

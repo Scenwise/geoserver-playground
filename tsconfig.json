@@ -21,7 +21,8 @@
     "paths": {
       "@/admin/*": ["./app/admin/*"],
       "@/*": ["./*"]
-    }
+    },
+    "types": ["google.maps"]
   },
   "include": [
     "next-env.d.ts",
