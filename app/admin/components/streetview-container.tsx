@@ -1,9 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TabsContent } from '@/components/ui/tabs'
 import { Coordinate } from 'ol/coordinate'
 import { StreetviewPanorama } from './streetview-panorama'
 import { StreetviewBirdseye } from './streetview-birdseye'
-import { cn } from '@/lib/utils'
 import { SquareMousePointerIcon } from 'lucide-react'
+import { TabsCard } from './tabs-card'
 
 export function StreetviewContainer({
   position,
@@ -24,49 +24,29 @@ export function StreetviewContainer({
   ]
 
   return (
-    <Tabs
-      defaultValue="streetview"
-      className={cn(
-        'w-full h-full bg-card shadow-centered overflow-hidden rounded-2xl gap-0',
-        className,
-      )}
-    >
-      <TabsList className="w-full p-0  rounded-none pb-7 h-16! -mb-7 overflow-hidden">
-        {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.value}
-            value={tab.value}
-            className="shadow-none! rounded-b-none rounded-t-2xl pb-7 -mb-7 h-16"
-          >
-            {tab.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+    <TabsCard tabs={tabs} className={className}>
+      <TabsContent value="streetview" asChild>
+        {position ? (
+          <StreetviewPanorama
+            position={position}
+            onPositionChange={onPositionChange}
+          />
+        ) : (
+          <StreetviewFallback />
+        )}
+      </TabsContent>
 
-      <div className="bg-card p-2 grow rounded-2xl relative z-10 *:rounded-[calc(var(--radius-2xl)-8px)] *:size-full ">
-        <TabsContent value="streetview" asChild>
-          {position ? (
-            <StreetviewPanorama
-              position={position}
-              onPositionChange={onPositionChange}
-            />
-          ) : (
-            <StreetviewFallback />
-          )}
-        </TabsContent>
-
-        <TabsContent value="birdseye" asChild>
-          {position ? (
-            <StreetviewBirdseye
-              position={position}
-              onPositionChange={onPositionChange}
-            />
-          ) : (
-            <StreetviewFallback />
-          )}
-        </TabsContent>
-      </div>
-    </Tabs>
+      <TabsContent value="birdseye" asChild>
+        {position ? (
+          <StreetviewBirdseye
+            position={position}
+            onPositionChange={onPositionChange}
+          />
+        ) : (
+          <StreetviewFallback />
+        )}
+      </TabsContent>
+    </TabsCard>
   )
 }
 
