@@ -17,7 +17,7 @@ function buildSwrKey(url: string, keyframes: SegmentationKeyframe[]) {
   return `streetview-segmentation-${url}-${keyframes
     .map(
       (kf) =>
-        `${kf.position.lat().toFixed(5)},${kf.position.lng().toFixed(5)},${Math.round(kf.zoom)},${Math.round(kf.bearing)},${kf.stepsToNext}`,
+        ${kf.position.lat().toFixed(5)},${kf.position.lng().toFixed(5)},${Math.round(kf.zoom)},${Math.round(kf.bearing)},${kf.stepsToNext},
     )
     .join('|')}`
 }
@@ -80,6 +80,7 @@ export function StreetviewSegmentation2({
   } = useSegmentation(TACTILE_API, keyframes)
 
   // Animate through keyframes when new segmentation result is available
+  const [activeTab, setActiveTab] = useState('sidepath')
   const [isAnimating, setIsAnimating] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -124,9 +125,18 @@ export function StreetviewSegmentation2({
 
   const selectedKeyframe = keyframes[selectedIndex]
 
+  function getCoverageRingColor(index: number): string {
+    const response = activeTab === 'sidepath' ? sidepathResponse : tactileResponse
+    if (!response) return 'ring-accent'
+    const detail: ImageDetail | undefined = response[String(index)]
+    if (!detail || detail.image_pixels === 0) return 'ring-accent'
+    const pct = (detail.mask_pixels / detail.image_pixels) * 100
+    return pct > 15 ? 'ring-green-500' : 'ring-red-500'
+  }
+
   return (
     <div className={cn('flex flex-col rounded-2xl bg-accent', className)}>
-      <TabsCard tabs={tabs}>
+      <TabsCard tabs={tabs} onValueChange={setActiveTab}>
         {isLoading && (
           <div className="absolute inset-0 z-20 bg-black/30 flex flex-col items-center justify-center">
             <Spinner color="white" className="size-10" />
@@ -177,7 +187,8 @@ export function StreetviewSegmentation2({
                 size="sm"
                 variant="default"
                 className={cn(
-                  'aspect-1 rounded-full p-0 border-0 ring-2 ring-accent',
+                  'aspect-1 rounded-full p-0 border-0 ring-2',
+                  getCoverageRingColor(index),
                   kf.interpolated ? 'size-2' : 'size-3',
                   selectedIndex !== index ? 'bg-muted-foreground!' : '',
                 )}
@@ -188,14 +199,27 @@ export function StreetviewSegmentation2({
 
         <div>
           <KeyframeMetadata keyframe={selectedKeyframe} />
+          {(() => {
+            const response = activeTab === 'sidepath' ? sidepathResponse : tactileResponse
+            const detail: ImageDetail | undefined = response?.[String(selectedIndex)]
+            if (!detail || detail.image_pixels === 0) return null
+            const pct = ((detail.mask_pixels / detail.image_pixels) * 100).toFixed(1)
+            return (
+              <p className="text-xs text-muted-foreground mt-1">
+                Coverage: {pct}%
+              </p>
+            )
+          })()}
         </div>
       </div>
     </div>
   )
 }
 
-function ResultImage({ response }: { response: Record<string, string> }) {
-  const images = Object.values(response) as string[]
+type ImageDetail = { image_str: string; image_pixels: number; mask_pixels: number }
+
+function ResultImage({ response }: { response: Record<string, ImageDetail> }) {
+  const images = Object.values(response).map((v) => v.image_str)
   const { selectedIndex } = useSegmentationStore()
 
   return (
