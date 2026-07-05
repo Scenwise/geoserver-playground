@@ -5,14 +5,17 @@ export function TabsCard({
   tabs,
   className,
   children,
+  onValueChange,
 }: {
   tabs: { label: string; value: string }[]
   className?: string
   children: React.ReactNode
+  onValueChange?: (value: string) => void
 }) {
   return (
     <Tabs
       defaultValue="streetview"
+      onValueChange={onValueChange}
       className={cn(
         'w-full h-full bg-card shadow-centered overflow-hidden rounded-2xl gap-0',
         className,
