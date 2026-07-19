@@ -19,6 +19,7 @@ import VectorLayer from 'ol/layer/Vector'
 import { Circle, Fill, Icon, Stroke, Style } from 'ol/style'
 import { Point } from 'ol/geom'
 import { Coordinate } from 'ol/coordinate'
+import GeoJSON from 'ol/format/GeoJSON'
 import { Button } from '@/components/ui/button'
 import { RefreshCcwIcon } from 'lucide-react'
 import { tools } from '@/admin/data/admin-sidebar'
@@ -129,6 +130,39 @@ export function StreetviewClientPage({
     mapRef.on('click', handler)
     return () => mapRef.un('click', handler)
   }, [initializeStreetViewLayers, mapRef, updatePosition])
+
+  // useEffect(() => {
+  //   if (!mapRef) return
+
+  //   const source = new VectorSource()
+  //   const layer = new VectorLayer({
+  //     source,
+  //     style: { 'stroke-color': 'red', 'stroke-width': 2 },
+  //   })
+  //   mapRef.addLayer(layer)
+
+  //   fetch('/ag_analysis_object.json')
+  //     .then((r) => r.json())
+  //     .then((data) => {
+  //       const features = Object.values(data.features as Record<string, { meta_data: { feature_id: string; align_index: number }; geometries: Record<string, { geometry: object }> }>).map((feat) => ({
+  //         id: feat.meta_data.feature_id,
+  //         type: 'Feature',
+  //         geometry: feat.geometries[String(feat.meta_data.align_index + 1)]?.geometry ?? null,
+  //         properties: feat.meta_data,
+  //       }))
+
+  //       source.addFeatures(
+  //         new GeoJSON().readFeatures(
+  //           { type: 'FeatureCollection', features },
+  //           { dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857' },
+  //         ),
+  //       )
+  //     })
+  //   return () => {
+  //     mapRef.removeLayer(layer)
+  //   }
+  // }, [mapRef])
+
 
   return (
     <PageContainer className="max-h-screen">

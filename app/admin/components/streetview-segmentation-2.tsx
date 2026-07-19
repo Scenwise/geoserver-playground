@@ -17,7 +17,7 @@ function buildSwrKey(url: string, keyframes: SegmentationKeyframe[]) {
   return `streetview-segmentation-${url}-${keyframes
     .map(
       (kf) =>
-        ${kf.position.lat().toFixed(5)},${kf.position.lng().toFixed(5)},${Math.round(kf.zoom)},${Math.round(kf.bearing)},${kf.stepsToNext},
+        [kf.position.lat().toFixed(5),kf.position.lng().toFixed(5),Math.round(kf.zoom),Math.round(kf.bearing),kf.stepsToNext].join(','),
     )
     .join('|')}`
 }
@@ -52,8 +52,8 @@ function useSegmentation(url: string, keyframes: SegmentationKeyframe[]) {
   )
 }
 
-const SIDEPATH_API = 'http://159.223.223.232:10000/segment_sidepath_batch'
-const TACTILE_API = 'http://159.223.223.232:10000/segment_tactile_batch'
+const SIDEPATH_API = 'https://sidepath.scenwise.nl/segment_sidepath_batch'
+const TACTILE_API = 'https://sidepath.scenwise.nl/segment_tactile_batch'
 
 export function StreetviewSegmentation2({
   className = '',
@@ -131,7 +131,7 @@ export function StreetviewSegmentation2({
     const detail: ImageDetail | undefined = response[String(index)]
     if (!detail || detail.image_pixels === 0) return 'ring-accent'
     const pct = (detail.mask_pixels / detail.image_pixels) * 100
-    return pct > 15 ? 'ring-green-500' : 'ring-red-500'
+    return pct > 1.5 ? 'ring-green-500' : 'ring-red-500'
   }
 
   return (
