@@ -52,8 +52,8 @@ function useSegmentation(url: string, keyframes: SegmentationKeyframe[]) {
   )
 }
 
-const SIDEPATH_API = 'http://159.223.223.232:10000/segment_sidepath_batch'
-const TACTILE_API = 'http://159.223.223.232:10000/segment_tactile_batch'
+const SIDEPATH_API = 'https://sidepath.scenwise.nl/segment_sidepath_batch'
+const TACTILE_API = 'https://sidepath.scenwise.nl/segment_tactile_batch'
 
 export function StreetviewSegmentation2({
   className = '',
