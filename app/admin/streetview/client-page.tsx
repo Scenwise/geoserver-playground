@@ -21,7 +21,7 @@ import { Point } from 'ol/geom'
 import { Coordinate } from 'ol/coordinate'
 import GeoJSON from 'ol/format/GeoJSON'
 import { Button } from '@/components/ui/button'
-import { RefreshCcwIcon } from 'lucide-react'
+import { GlobeIcon, RefreshCcwIcon } from 'lucide-react'
 import { tools } from '@/admin/data/admin-sidebar'
 import { StreetviewContainer } from '../components/streetview-container'
 import { getMainGeoserverMap } from '../actions/geoserver-map'
@@ -29,6 +29,8 @@ import { StreetviewPath } from '../components/steetview-path'
 import { StreetviewSegmentation2 } from '../components/streetview-segmentation-2'
 import { useSegmentationStore } from '@/store/segmentationStore'
 import { latLngToCoordinate } from '@/lib/google-maps'
+import { GlobeView } from '../components/globe-view'
+import { Toggle } from '@/components/ui/toggle'
 
 export function StreetviewClientPage({
   map,
@@ -37,6 +39,7 @@ export function StreetviewClientPage({
 }) {
   const [swappedLayout, setSwappedLayout] = useState(false)
   const [isSegmentationMode, setIsSegmentationMode] = useState(false)
+  const [globeEnabled, setGlobeEnabled] = useState(false)
 
   const [location, setLocation] = useState<
     { position: Coordinate; heading: number; zoom: number } | undefined
@@ -182,6 +185,15 @@ export function StreetviewClientPage({
             <RefreshCcwIcon />
             Swap layout
           </Button>
+          <Toggle
+            pressed={globeEnabled}
+            onPressedChange={setGlobeEnabled}
+            variant="outline"
+            aria-label="Toggle globe view"
+          >
+            <GlobeIcon />
+            Globe view
+          </Toggle>
         </PageHeaderActions>
       </PageHeader>
       <PageContent className="grow grid gap-6 grid-cols-2 grid-rows-[1fr_1fr_auto]">
@@ -190,7 +202,11 @@ export function StreetviewClientPage({
             swappedLayout ? 'col-[2/3] row-[1/2]' : 'col-[1/2] row-[1/3]'
           }
         >
-          <OpenLayersMap onMapReady={setMap} mapData={map} />
+          {globeEnabled ? (
+            <GlobeView center={location?.position} zoom={17} tilt={45} heading={location?.heading} />
+          ) : (
+            <OpenLayersMap onMapReady={setMap} mapData={map} />
+          )}
         </MapContainer>
 
         {!isSegmentationMode ? (
