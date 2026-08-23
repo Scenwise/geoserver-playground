@@ -19,10 +19,12 @@ export type MapLayer = ReturnType<typeof useMapLayer>
 export function LayersControl({
   map,
   className,
+  onGlobeChange,
 }: {
   map: Map | null
   className?: string
   mapLayers?: MapLayer[]
+  onGlobeChange?: (enabled: boolean, tilt: number) => void
 }) {
   const [open, setOpen] = useState(false)
 
@@ -64,7 +66,11 @@ export function LayersControl({
                   setSelected={setSelectedId}
                 />
               ) : (
-                <LayersControlMain map={map} setSelected={setSelectedId} />
+                <LayersControlMain
+                  map={map}
+                  setSelected={setSelectedId}
+                  onGlobeChange={onGlobeChange}
+                />
               )}
             </DropdownMenuGroup>
           </DropdownMenuContent>
@@ -75,3 +81,4 @@ export function LayersControl({
     </>
   )
 }
+
