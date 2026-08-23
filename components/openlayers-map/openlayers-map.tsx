@@ -22,6 +22,7 @@ import { Layer } from 'ol/layer'
 import { CustomLayer } from './custom-layers'
 import { MapLayerStoreProvider } from '@/providers/MapLayerStoreProvider'
 import { getGeoserverMapById } from '@/admin/actions/geoserver-map'
+import { useMapSettingsStore } from '@/store/mapSettingsStore'
 
 const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -49,6 +50,11 @@ function OpenLayersMapInner({ ref, onMapReady, mapData }: OpenLayersMapProps) {
   const { styleUrl } = useMapStyle()
 
   const [map, setMap] = useState<Map | null>(null)
+  const [globeEnabled, setGlobeEnabled] = useState(false)
+  const [globeTilt, setGlobeTilt] = useState(90)
+
+  const { setMapStyle } = useMapSettingsStore()
+
   const mapRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (!node) return
@@ -103,16 +109,34 @@ function OpenLayersMapInner({ ref, onMapReady, mapData }: OpenLayersMapProps) {
     return mapData.layers.filter((layer) => layer.source === 'custom')
   }, [mapData?.layers])
 
+  function handleGlobeChange(enabled: boolean, tilt: number) {
+    setGlobeEnabled(enabled)
+    setGlobeTilt(tilt)
+    if (enabled) {
+      setMapStyle('satellite')
+    }
+  }
+
+  const tiltStyle = globeEnabled
+    ? {
+        transform: `perspective(800px) rotateX(${globeTilt}deg)`,
+        transformOrigin: '50% 100%',
+        transition: 'transform 0.4s ease',
+      }
+    : {
+        transition: 'transform 0.4s ease',
+      }
+
   return (
     <div className="w-full h-full grid place-items-center *:row-1 *:col-1 *:z-10 @container">
-      <div className="w-full h-full" ref={mapRef} />
+      <div className="w-full h-full" style={tiltStyle} ref={mapRef} />
 
       <ZoomControl className="self-start place-self-end mt-3 mr-3" map={map} />
 
       <div className="flex gap-3 self-end place-self-end mb-3 mr-3">
         <StyleControl map={map} />
 
-        <LayersControl map={map} />
+        <LayersControl map={map} onGlobeChange={handleGlobeChange} />
       </div>
 
       {tileLayers.map((layer) => (
@@ -144,3 +168,4 @@ export function MapContainer({
     </div>
   )
 }
+
