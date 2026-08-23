@@ -203,7 +203,7 @@ export function StreetviewClientPage({
           }
         >
           {globeEnabled ? (
-            <GlobeView center={location?.position} zoom={17} tilt={45} heading={location?.heading} />
+            <GlobeView center={location?.position} zoom={17} heading={location?.heading} />
           ) : (
             <OpenLayersMap onMapReady={setMap} mapData={map} />
           )}
