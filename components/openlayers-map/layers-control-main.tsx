@@ -5,6 +5,7 @@ import {
 } from '../ui/dropdown-menu'
 import { SplineIcon, GitCommitIcon, ChevronRightIcon } from 'lucide-react'
 import { LayersControlPublicTransport } from './layers-control-public-transport'
+import { LayersControlGlobe } from './layers-control-globe'
 import { Map } from 'ol'
 import { cn } from '@/lib/utils'
 import { useShallow } from 'zustand/react/shallow'
@@ -13,9 +14,11 @@ import { useMapLayerStore } from '@/providers/MapLayerStoreProvider'
 export function LayersControlMain({
   map,
   setSelected,
+  onGlobeChange,
 }: {
   map: Map | null
   setSelected: (selected: number | null) => void
+  onGlobeChange?: (enabled: boolean, tilt: number) => void
 }) {
   const layers = useMapLayerStore(
     useShallow((state) => Object.values(state.layers)),
@@ -50,6 +53,7 @@ export function LayersControlMain({
       <DropdownMenuLabel>Additional layers</DropdownMenuLabel>
 
       <LayersControlPublicTransport map={map} />
+      <LayersControlGlobe map={map} onGlobeChange={onGlobeChange} />
     </>
   )
 }
