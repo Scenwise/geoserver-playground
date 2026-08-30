@@ -207,6 +207,7 @@ export function StreetviewClientPage({
               style={{ display: globeEnabled ? 'block' : 'none' }}
               center={location?.position ?? mapRef?.getView().getCenter()}
               heading={location?.heading}
+              layers={map?.layers ?? []}
             />
           )}
         </MapContainer>
