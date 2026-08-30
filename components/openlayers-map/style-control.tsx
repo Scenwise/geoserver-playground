@@ -28,6 +28,11 @@ export function StyleControl({
       onGlobeToggle?.(true)
       return
     }
+    // empty string = user clicked the active item to deselect, or picked a real style
+    if (!value && globeActive) {
+      onGlobeToggle?.(false)
+      return
+    }
     if (MAP_STYLES[value as MapStyle]) {
       onGlobeToggle?.(false)
       setStyle(value as MapStyle)

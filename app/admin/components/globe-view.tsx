@@ -3,14 +3,26 @@
 import { CSSProperties, useEffect, useRef, useState } from 'react'
 import { Coordinate } from 'ol/coordinate'
 import { coordinateToLatLng } from '@/lib/google-maps'
+import { GeoserverLayer } from '@/store/mapLayerStore'
 
 const MAX_TILT = 67.5
+const TILT_SENSITIVITY = 0.4
+
+// Colors cycled per layer index
+const LAYER_COLORS = [
+  { fill: '#e53935cc', stroke: '#e53935' },
+  { fill: '#1e88e5cc', stroke: '#1e88e5' },
+  { fill: '#43a047cc', stroke: '#43a047' },
+  { fill: '#fb8c00cc', stroke: '#fb8c00' },
+  { fill: '#8e24aacc', stroke: '#8e24aa' },
+]
 
 interface GlobeViewProps {
   center?: Coordinate
   heading?: number
   className?: string
   style?: CSSProperties
+  layers?: GeoserverLayer[]
 }
 
 function waitForGoogleMaps(cb: () => void, retries = 20) {
@@ -25,28 +37,82 @@ function waitForGoogleMaps(cb: () => void, retries = 20) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Map3DElement = any
 
+async function addGeoJsonToMap(
+  map: Map3DElement,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  geojson: { features: { geometry: any }[] },
+  colorIndex: number,
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { Polygon3DElement, Polyline3DElement } = await (google.maps as any).importLibrary('maps3d')
+  const color = LAYER_COLORS[colorIndex % LAYER_COLORS.length]
+  const elements: unknown[] = []
+
+  for (const feature of geojson.features) {
+    const geom = feature.geometry
+    if (!geom) continue
+
+    if (geom.type === 'Polygon' || geom.type === 'MultiPolygon') {
+      const rings =
+        geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates
+      for (const polygon of rings) {
+        for (const ring of polygon) {
+          const el = new Polygon3DElement({
+            altitudeMode: 'CLAMP_TO_GROUND',
+            fillColor: color.fill,
+            strokeColor: color.stroke,
+            strokeWidth: 2,
+            drawsOccludedSegments: false,
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          el.outerCoordinates = (ring as any[]).map(([lng, lat]: [number, number]) => ({ lat, lng, altitude: 0 }))
+          map.append(el)
+          elements.push(el)
+        }
+      }
+    } else if (geom.type === 'LineString' || geom.type === 'MultiLineString') {
+      const lines =
+        geom.type === 'LineString' ? [geom.coordinates] : geom.coordinates
+      for (const coords of lines) {
+        const el = new Polyline3DElement({
+          altitudeMode: 'CLAMP_TO_GROUND',
+          strokeColor: color.stroke,
+          strokeWidth: 3,
+          drawsOccludedSegments: false,
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        el.coordinates = (coords as any[]).map(([lng, lat]: [number, number]) => ({ lat, lng, altitude: 0 }))
+        map.append(el)
+        elements.push(el)
+      }
+    }
+  }
+
+  return elements
+}
+
 export function GlobeView({
   center,
   heading = 0,
   className,
   style,
+  layers = [],
 }: GlobeViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<Map3DElement>(null)
+  const tiltRef = useRef(0)
   const [tilt, setTiltState] = useState(0)
+  const [isTilting, setIsTilting] = useState(false)
 
-  // Keep a ref so the async init always reads the latest center value,
-  // even if it arrives after the component mounts (display:none pre-mount case)
   const centerRef = useRef(center)
   useEffect(() => { centerRef.current = center }, [center])
 
+  // Init Map3DElement once
   useEffect(() => {
     if (!containerRef.current) return
 
-    console.log('[GlobeView] waiting for google.maps...')
     waitForGoogleMaps(() => {
       if (!containerRef.current) return
-      console.log('[GlobeView] loading maps3d library')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       google.maps.importLibrary('maps3d').then((lib: any) => {
@@ -54,7 +120,6 @@ export function GlobeView({
 
         const { Map3DElement } = lib
 
-        // Use the ref so we get the value at the time of init, not mount
         const latLng = centerRef.current
           ? coordinateToLatLng(centerRef.current)
           : new google.maps.LatLng(52.3676, 4.9041)
@@ -73,8 +138,6 @@ export function GlobeView({
 
         containerRef.current.appendChild(map)
         mapRef.current = map
-
-        console.log('[GlobeView] Map3DElement created')
       })
     })
 
@@ -87,69 +150,139 @@ export function GlobeView({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Sync center
   useEffect(() => {
     if (!mapRef.current || !center) return
     const latLng = coordinateToLatLng(center)
     mapRef.current.center = { lat: latLng.lat(), lng: latLng.lng(), altitude: 0 }
   }, [center])
 
+  // Sync heading
   useEffect(() => {
     if (!mapRef.current) return
     mapRef.current.heading = heading
   }, [heading])
 
-  function applyTilt(value: number) {
-    const clamped = Math.max(0, Math.min(MAX_TILT, value))
-    setTiltState(clamped)
-    if (mapRef.current) {
-      mapRef.current.tilt = clamped
-      console.log('[GlobeView] tilt set to', clamped)
+  // Load WFS GeoJSON layers onto the 3D map
+  useEffect(() => {
+    if (!layers.length) return
+
+    let cancelled = false
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const addedElements: any[][] = []
+
+    async function loadLayers() {
+      // Wait until map is ready
+      let attempts = 0
+      while (!mapRef.current && attempts++ < 40) {
+        await new Promise((r) => setTimeout(r, 250))
+      }
+      if (!mapRef.current || cancelled) return
+
+      for (let i = 0; i < layers.length; i++) {
+        const layer = layers[i]
+        try {
+          const res = await fetch(`/api/geoserver/geojson/${layer.layerId}`)
+          if (!res.ok || cancelled) continue
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const geojson: { features: { geometry: any }[] } = await res.json()
+          if (cancelled || !mapRef.current) break
+          const els = await addGeoJsonToMap(mapRef.current, geojson, i)
+          addedElements.push(els as unknown[])
+        } catch {
+          // skip failed layers silently
+        }
+      }
     }
-  }
+
+    loadLayers()
+
+    return () => {
+      cancelled = true
+      // Remove all added 3D elements on cleanup
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      addedElements.forEach((group) => group.forEach((el: any) => el.remove?.()))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layers])
+
+  // Cmd/Ctrl + drag to tilt
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    let dragging = false
+    let lastY = 0
+
+    function applyTilt(delta: number) {
+      const next = Math.max(0, Math.min(MAX_TILT, tiltRef.current + delta))
+      tiltRef.current = next
+      setTiltState(next)
+      if (mapRef.current) mapRef.current.tilt = next
+    }
+
+    function onMouseDown(e: MouseEvent) {
+      if (!e.metaKey && !e.ctrlKey) return
+      dragging = true
+      lastY = e.clientY
+      setIsTilting(true)
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    function onMouseMove(e: MouseEvent) {
+      if (!dragging) return
+      const delta = (lastY - e.clientY) * TILT_SENSITIVITY
+      lastY = e.clientY
+      applyTilt(delta)
+    }
+
+    function onMouseUp() {
+      if (!dragging) return
+      dragging = false
+      setIsTilting(false)
+    }
+
+    el.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+
+    return () => {
+      el.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [])
 
   return (
-    <div className={className} style={{ width: '100%', height: '100%', position: 'relative', ...style }}>
+    <div
+      className={className}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        cursor: isTilting ? 'ns-resize' : undefined,
+        ...style,
+      }}
+    >
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 
       <div style={{
         position: 'absolute',
-        bottom: '80px',
-        right: '10px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '4px',
-        zIndex: 10,
-        background: 'white',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        padding: '8px 6px',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+        bottom: '12px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        pointerEvents: 'none',
+        background: 'rgba(0,0,0,0.55)',
+        color: 'white',
+        fontSize: '12px',
+        padding: '4px 10px',
+        borderRadius: '20px',
+        whiteSpace: 'nowrap',
+        opacity: isTilting ? 1 : 0,
+        transition: 'opacity 0.2s',
       }}>
-        <span style={{ fontSize: '10px', color: '#555', fontWeight: 600, letterSpacing: '0.04em' }}>
-          TILT
-        </span>
-        <span style={{ fontSize: '11px', color: '#333', fontWeight: 600 }}>
-          {Math.round(tilt)}°
-        </span>
-        <span style={{ fontSize: '10px', color: '#aaa' }}>{MAX_TILT}°</span>
-        <div style={{ height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <input
-            type="range"
-            min={0}
-            max={MAX_TILT}
-            step={0.5}
-            value={tilt}
-            onChange={(e) => applyTilt(Number(e.target.value))}
-            style={{
-              width: '100px',
-              cursor: 'pointer',
-              accentColor: '#1a73e8',
-              transform: 'rotate(-90deg)',
-            }}
-          />
-        </div>
-        <span style={{ fontSize: '10px', color: '#aaa' }}>0°</span>
+        Tilt {Math.round(tilt)}°
       </div>
     </div>
   )
