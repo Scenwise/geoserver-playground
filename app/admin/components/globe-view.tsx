@@ -35,6 +35,11 @@ export function GlobeView({
   const mapRef = useRef<Map3DElement>(null)
   const [tilt, setTiltState] = useState(0)
 
+  // Keep a ref so the async init always reads the latest center value,
+  // even if it arrives after the component mounts (display:none pre-mount case)
+  const centerRef = useRef(center)
+  useEffect(() => { centerRef.current = center }, [center])
+
   useEffect(() => {
     if (!containerRef.current) return
 
@@ -49,8 +54,9 @@ export function GlobeView({
 
         const { Map3DElement } = lib
 
-        const latLng = center
-          ? coordinateToLatLng(center)
+        // Use the ref so we get the value at the time of init, not mount
+        const latLng = centerRef.current
+          ? coordinateToLatLng(centerRef.current)
           : new google.maps.LatLng(52.3676, 4.9041)
 
         const map: Map3DElement = new Map3DElement({
