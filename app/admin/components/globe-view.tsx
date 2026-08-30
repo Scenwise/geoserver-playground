@@ -206,7 +206,7 @@ export function GlobeView({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [layers])
 
-  // Cmd/Ctrl + drag to tilt
+  // Alt/Option + drag to tilt (leaves Cmd/Ctrl free for map's native rotation)
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -222,7 +222,7 @@ export function GlobeView({
     }
 
     function onMouseDown(e: MouseEvent) {
-      if (!e.metaKey && !e.ctrlKey) return
+      if (!e.altKey) return
       dragging = true
       lastY = e.clientY
       setIsTilting(true)
@@ -282,7 +282,7 @@ export function GlobeView({
         opacity: isTilting ? 1 : 0,
         transition: 'opacity 0.2s',
       }}>
-        Tilt {Math.round(tilt)}°
+        Tilt {Math.round(tilt)}° — hold Alt/Option + drag
       </div>
     </div>
   )
