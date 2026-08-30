@@ -39,7 +39,8 @@ type Map3DElement = any
 
 async function addGeoJsonToMap(
   map: Map3DElement,
-  geojson: GeoJSON.FeatureCollection,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  geojson: { features: { geometry: any }[] },
   colorIndex: number,
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -183,7 +184,8 @@ export function GlobeView({
         try {
           const res = await fetch(`/api/geoserver/geojson/${layer.layerId}`)
           if (!res.ok || cancelled) continue
-          const geojson: GeoJSON.FeatureCollection = await res.json()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const geojson: { features: { geometry: any }[] } = await res.json()
           if (cancelled || !mapRef.current) break
           const els = await addGeoJsonToMap(mapRef.current, geojson, i)
           addedElements.push(els as unknown[])
