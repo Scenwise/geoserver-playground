@@ -34,6 +34,8 @@ interface OpenLayersMapProps {
   ref?: Ref<MapHandle>
   onMapReady?: (map: Map) => void
   mapData?: Awaited<ReturnType<typeof getGeoserverMapById>>
+  globeActive?: boolean
+  onGlobeToggle?: (enabled: boolean) => void
 }
 
 export function OpenLayersMap(props: OpenLayersMapProps) {
@@ -44,7 +46,7 @@ export function OpenLayersMap(props: OpenLayersMapProps) {
   )
 }
 
-function OpenLayersMapInner({ ref, onMapReady, mapData }: OpenLayersMapProps) {
+function OpenLayersMapInner({ ref, onMapReady, mapData, globeActive, onGlobeToggle }: OpenLayersMapProps) {
   const vectorLayerRef = useRef<MapboxVectorLayer | null>(null)
   const { styleUrl } = useMapStyle()
 
@@ -109,7 +111,7 @@ function OpenLayersMapInner({ ref, onMapReady, mapData }: OpenLayersMapProps) {
       <ZoomControl className="self-start place-self-end mt-3 mr-3" map={map} />
 
       <div className="flex gap-3 self-end place-self-end mb-3 mr-3">
-        <StyleControl map={map} />
+        <StyleControl map={map} globeActive={globeActive} onGlobeToggle={onGlobeToggle} />
         <LayersControl map={map} />
       </div>
 

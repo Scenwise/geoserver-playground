@@ -21,7 +21,7 @@ import { Point } from 'ol/geom'
 import { Coordinate } from 'ol/coordinate'
 import GeoJSON from 'ol/format/GeoJSON'
 import { Button } from '@/components/ui/button'
-import { GlobeIcon, RefreshCcwIcon } from 'lucide-react'
+import { RefreshCcwIcon } from 'lucide-react'
 import { tools } from '@/admin/data/admin-sidebar'
 import { StreetviewContainer } from '../components/streetview-container'
 import { getMainGeoserverMap } from '../actions/geoserver-map'
@@ -30,7 +30,6 @@ import { StreetviewSegmentation2 } from '../components/streetview-segmentation-2
 import { useSegmentationStore } from '@/store/segmentationStore'
 import { latLngToCoordinate } from '@/lib/google-maps'
 import { GlobeView } from '../components/globe-view'
-import { Toggle } from '@/components/ui/toggle'
 
 export function StreetviewClientPage({
   map,
@@ -186,15 +185,6 @@ export function StreetviewClientPage({
             <RefreshCcwIcon />
             Swap layout
           </Button>
-          <Toggle
-            pressed={globeEnabled}
-            onPressedChange={(v) => { setGlobeEnabled(v); if (v) setGlobeEverEnabled(true) }}
-            variant="outline"
-            aria-label="Toggle globe view"
-          >
-            <GlobeIcon />
-            Globe view
-          </Toggle>
         </PageHeaderActions>
       </PageHeader>
       <PageContent className="grow grid gap-6 grid-cols-2 grid-rows-[1fr_1fr_auto]">
@@ -204,13 +194,18 @@ export function StreetviewClientPage({
           }
         >
           <div className="w-full h-full" style={{ display: globeEnabled ? 'none' : 'block' }}>
-            <OpenLayersMap onMapReady={setMap} mapData={map} />
+            <OpenLayersMap
+              onMapReady={setMap}
+              mapData={map}
+              globeActive={globeEnabled}
+              onGlobeToggle={(enabled) => { setGlobeEnabled(enabled); if (enabled) setGlobeEverEnabled(true) }}
+            />
           </div>
           {globeEverEnabled && (
             <GlobeView
               className="w-full h-full"
               style={{ display: globeEnabled ? 'block' : 'none' }}
-              center={location?.position}
+              center={location?.position ?? mapRef?.getView().getCenter()}
               heading={location?.heading}
             />
           )}

@@ -1,6 +1,6 @@
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
-import { PaletteIcon, SatelliteIcon, CarIcon } from 'lucide-react'
+import { PaletteIcon, SatelliteIcon, CarIcon, GlobeIcon } from 'lucide-react'
 
 export const MAP_STYLES = {
   basic: {
@@ -27,7 +27,15 @@ export const MAP_STYLES = {
       dark: 'mapbox://styles/mapbox/satellite-v9',
     },
   },
-}
+  globe: {
+    label: 'Globe',
+    icon: GlobeIcon,
+    url: {
+      light: null,
+      dark: null,
+    },
+  },
+} as const
 
 export type MapStyle = keyof typeof MAP_STYLES
 
@@ -35,8 +43,10 @@ export function useMapStyle(style: MapStyle = 'basic') {
   const { resolvedTheme } = useTheme()
 
   const styleUrl = useMemo(() => {
+    const s = MAP_STYLES[style]
+    if (!s.url.light) return MAP_STYLES.basic.url.light
     const themeKey = (resolvedTheme ?? 'light') as 'light' | 'dark'
-    return MAP_STYLES[style].url[themeKey]
+    return s.url[themeKey] as string
   }, [resolvedTheme, style])
 
   return { styleUrl }
