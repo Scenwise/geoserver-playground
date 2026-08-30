@@ -8,7 +8,6 @@ const MAX_TILT = 67.5
 
 interface GlobeViewProps {
   center?: Coordinate
-  zoom?: number
   heading?: number
   className?: string
   style?: CSSProperties
@@ -23,15 +22,17 @@ function waitForGoogleMaps(cb: () => void, retries = 20) {
   setTimeout(() => waitForGoogleMaps(cb, retries - 1), 250)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Map3DElement = any
+
 export function GlobeView({
   center,
-  zoom = 17,
   heading = 0,
   className,
   style,
 }: GlobeViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<google.maps.Map | null>(null)
+  const mapRef = useRef<Map3DElement>(null)
   const [tilt, setTiltState] = useState(0)
 
   useEffect(() => {
@@ -40,57 +41,64 @@ export function GlobeView({
     console.log('[GlobeView] waiting for google.maps...')
     waitForGoogleMaps(() => {
       if (!containerRef.current) return
-      console.log('[GlobeView] google.maps ready, initializing map')
+      console.log('[GlobeView] loading maps3d library')
 
-      const latLng = center
-        ? coordinateToLatLng(center)
-        : new google.maps.LatLng(52.3676, 4.9041)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      google.maps.importLibrary('maps3d').then((lib: any) => {
+        if (!containerRef.current) return
 
-      const gmap = new google.maps.Map(containerRef.current, {
-        center: latLng,
-        zoom,
-        tilt: 0,
-        heading,
-        mapTypeId: 'satellite',
-        mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? 'DEMO_MAP_ID',
-        disableDefaultUI: true,
-        rotateControl: true,
-        zoomControl: true,
-        gestureHandling: 'greedy',
-      })
+        const { Map3DElement } = lib
 
-      mapRef.current = gmap
-      console.log('[GlobeView] map created, mapId:', process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? 'DEMO_MAP_ID')
+        const latLng = center
+          ? coordinateToLatLng(center)
+          : new google.maps.LatLng(52.3676, 4.9041)
 
-      gmap.addListener('tilesloaded', () => {
-        console.log('[GlobeView] tilesloaded, renderingType:', gmap.getRenderingType(), '| tilt:', gmap.getTilt())
-      })
+        const map: Map3DElement = new Map3DElement({
+          center: { lat: latLng.lat(), lng: latLng.lng(), altitude: 0 },
+          range: 1800,
+          tilt: 0,
+          heading,
+          mode: 'HYBRID',
+          defaultUIHidden: false,
+        })
 
-      gmap.addListener('tilt_changed', () => {
-        const t = gmap.getTilt() ?? 0
-        console.log('[GlobeView] tilt_changed ->', t)
-        setTiltState(t)
+        map.style.width = '100%'
+        map.style.height = '100%'
+
+        containerRef.current.appendChild(map)
+        mapRef.current = map
+
+        console.log('[GlobeView] Map3DElement created')
       })
     })
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove()
+        mapRef.current = null
+      }
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (!mapRef.current || !center) return
-    mapRef.current.moveCamera({ center: coordinateToLatLng(center) })
+    const latLng = coordinateToLatLng(center)
+    mapRef.current.center = { lat: latLng.lat(), lng: latLng.lng(), altitude: 0 }
   }, [center])
 
   useEffect(() => {
     if (!mapRef.current) return
-    mapRef.current.moveCamera({ heading })
+    mapRef.current.heading = heading
   }, [heading])
 
   function applyTilt(value: number) {
     const clamped = Math.max(0, Math.min(MAX_TILT, value))
-    console.log('[GlobeView] applyTilt ->', clamped)
     setTiltState(clamped)
-    mapRef.current?.moveCamera({ tilt: clamped })
-    console.log('[GlobeView] getTilt() after moveCamera:', mapRef.current?.getTilt())
+    if (mapRef.current) {
+      mapRef.current.tilt = clamped
+      console.log('[GlobeView] tilt set to', clamped)
+    }
   }
 
   return (
