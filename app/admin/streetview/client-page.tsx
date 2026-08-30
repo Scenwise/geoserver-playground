@@ -4,6 +4,7 @@ import {
   OpenLayersMap,
   MapContainer,
 } from '@/components/openlayers-map/openlayers-map'
+import { StyleControl } from '@/components/openlayers-map/style-control'
 import { PageContainer, PageContent } from '@/components/page/page-container'
 import {
   PageHeader,
@@ -202,13 +203,21 @@ export function StreetviewClientPage({
             />
           </div>
           {globeEverEnabled && (
-            <GlobeView
-              className="w-full h-full"
-              style={{ display: globeEnabled ? 'block' : 'none' }}
-              center={location?.position ?? mapRef?.getView().getCenter()}
-              heading={location?.heading}
-              layers={map?.layers ?? []}
-            />
+            <div className="w-full h-full relative" style={{ display: globeEnabled ? 'block' : 'none' }}>
+              <GlobeView
+                className="w-full h-full"
+                center={location?.position ?? mapRef?.getView().getCenter()}
+                heading={location?.heading}
+                layers={map?.layers ?? []}
+              />
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
+                <StyleControl
+                  map={null}
+                  globeActive={globeEnabled}
+                  onGlobeToggle={(enabled) => setGlobeEnabled(enabled)}
+                />
+              </div>
+            </div>
           )}
         </MapContainer>
 
