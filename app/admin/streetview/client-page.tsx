@@ -46,6 +46,7 @@ export function StreetviewClientPage({
   >()
 
   const [mapRef, setMap] = useState<Map | null>(null)
+  const [globeEverEnabled, setGlobeEverEnabled] = useState(false)
   const clickSource = useRef<VectorSource>(new VectorSource())
   const keyframeSource = useRef<VectorSource>(new VectorSource())
 
@@ -187,7 +188,7 @@ export function StreetviewClientPage({
           </Button>
           <Toggle
             pressed={globeEnabled}
-            onPressedChange={setGlobeEnabled}
+            onPressedChange={(v) => { setGlobeEnabled(v); if (v) setGlobeEverEnabled(true) }}
             variant="outline"
             aria-label="Toggle globe view"
           >
@@ -202,10 +203,17 @@ export function StreetviewClientPage({
             swappedLayout ? 'col-[2/3] row-[1/2]' : 'col-[1/2] row-[1/3]'
           }
         >
-          {globeEnabled ? (
-            <GlobeView center={location?.position} zoom={17} heading={location?.heading} />
-          ) : (
+          <div className="w-full h-full" style={{ display: globeEnabled ? 'none' : 'block' }}>
             <OpenLayersMap onMapReady={setMap} mapData={map} />
+          </div>
+          {globeEverEnabled && (
+            <GlobeView
+              className="w-full h-full"
+              style={{ display: globeEnabled ? 'block' : 'none' }}
+              center={location?.position}
+              zoom={17}
+              heading={location?.heading}
+            />
           )}
         </MapContainer>
 
