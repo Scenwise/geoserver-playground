@@ -52,7 +52,7 @@ export function GlobeView({
         tilt: 0,
         heading,
         mapTypeId: 'satellite',
-        mapId: 'DEMO_MAP_ID',
+        mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? 'DEMO_MAP_ID',
         disableDefaultUI: true,
         rotateControl: true,
         zoomControl: true,
@@ -60,10 +60,10 @@ export function GlobeView({
       })
 
       mapRef.current = gmap
-      console.log('[GlobeView] map created')
+      console.log('[GlobeView] map created, mapId:', process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? 'DEMO_MAP_ID')
 
       gmap.addListener('tilesloaded', () => {
-        console.log('[GlobeView] tilesloaded, tilt:', gmap.getTilt())
+        console.log('[GlobeView] tilesloaded, renderingType:', gmap.getRenderingType(), '| tilt:', gmap.getTilt())
       })
 
       gmap.addListener('tilt_changed', () => {
