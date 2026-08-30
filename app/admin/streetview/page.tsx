@@ -12,7 +12,7 @@ export default async function StreetviewPage() {
       <StreetviewClientPage map={mainMap} />
 
       <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${API_KEY}&v=weekly`}
+        src={`https://maps.googleapis.com/maps/api/js?key=${API_KEY}&v=alpha&libraries=maps3d`}
         defer
         async
       />
