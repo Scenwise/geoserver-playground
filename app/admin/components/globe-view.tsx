@@ -30,7 +30,7 @@ export function GlobeView({
 }: GlobeViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<google.maps.Map | null>(null)
-  const [tilt, setTiltState] = useState(45)
+  const [tilt, setTiltState] = useState(0)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -45,9 +45,10 @@ export function GlobeView({
       const gmap = new google.maps.Map(containerRef.current, {
         center: latLng,
         zoom,
-        tilt: 45,
+        tilt: 0,
         heading,
         mapTypeId: 'satellite',
+        mapId: 'DEMO_MAP_ID',
         disableDefaultUI: true,
         rotateControl: true,
         zoomControl: true,
@@ -57,7 +58,7 @@ export function GlobeView({
       mapRef.current = gmap
 
       gmap.addListener('tilt_changed', () => {
-        setTiltState(gmap.getTilt() ?? 45)
+        setTiltState(gmap.getTilt() ?? 0)
       })
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,7 +75,7 @@ export function GlobeView({
   }, [heading])
 
   function applyTilt(value: number) {
-    const clamped = Math.max(0, Math.min(90, value))
+    const clamped = Math.max(0, Math.min(45, value))
     setTiltState(clamped)
     mapRef.current?.setTilt(clamped)
   }
@@ -89,33 +90,38 @@ export function GlobeView({
         right: '10px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '4px',
+        alignItems: 'center',
+        gap: '6px',
         zIndex: 10,
+        background: 'white',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        padding: '8px 6px',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
       }}>
-        <button
-          onClick={() => applyTilt(tilt + 15)}
+        <span style={{ fontSize: '10px', color: '#555', fontWeight: 600, letterSpacing: '0.04em' }}>
+          TILT
+        </span>
+        <span style={{ fontSize: '11px', color: '#333', fontWeight: 600 }}>
+          {Math.round(tilt)}°
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={45}
+          step={1}
+          value={tilt}
+          onChange={(e) => applyTilt(Number(e.target.value))}
           style={{
-            width: '32px', height: '32px',
-            background: 'white', border: '1px solid #ccc',
-            borderRadius: '4px', cursor: 'pointer',
-            fontSize: '18px', fontWeight: 'bold',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+            writingMode: 'vertical-lr',
+            direction: 'rtl',
+            width: '24px',
+            height: '100px',
+            cursor: 'pointer',
+            accentColor: '#1a73e8',
           }}
-          title={`Increase tilt (${tilt}°)`}
-        >↑</button>
-        <button
-          onClick={() => applyTilt(tilt - 15)}
-          style={{
-            width: '32px', height: '32px',
-            background: 'white', border: '1px solid #ccc',
-            borderRadius: '4px', cursor: 'pointer',
-            fontSize: '18px', fontWeight: 'bold',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
-          }}
-          title={`Decrease tilt (${tilt}°)`}
-        >↓</button>
+        />
+        <span style={{ fontSize: '10px', color: '#aaa' }}>0°</span>
       </div>
     </div>
   )
