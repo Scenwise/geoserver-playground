@@ -35,8 +35,10 @@ export function GlobeView({
   useEffect(() => {
     if (!containerRef.current) return
 
+    console.log('[GlobeView] waiting for google.maps...')
     waitForGoogleMaps(() => {
       if (!containerRef.current) return
+      console.log('[GlobeView] google.maps ready, initializing map')
 
       const latLng = center
         ? coordinateToLatLng(center)
@@ -56,9 +58,16 @@ export function GlobeView({
       })
 
       mapRef.current = gmap
+      console.log('[GlobeView] map created, mapId=DEMO_MAP_ID, initial tilt=0')
+
+      gmap.addListener('tilesloaded', () => {
+        console.log('[GlobeView] tilesloaded, current tilt:', gmap.getTilt())
+      })
 
       gmap.addListener('tilt_changed', () => {
-        setTiltState(gmap.getTilt() ?? 0)
+        const t = gmap.getTilt() ?? 0
+        console.log('[GlobeView] tilt_changed ->', t)
+        setTiltState(t)
       })
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -76,8 +85,10 @@ export function GlobeView({
 
   function applyTilt(value: number) {
     const clamped = Math.max(0, Math.min(45, value))
+    console.log('[GlobeView] applyTilt ->', clamped)
     setTiltState(clamped)
     mapRef.current?.setTilt(clamped)
+    console.log('[GlobeView] getTilt() after setTilt:', mapRef.current?.getTilt())
   }
 
   return (
