@@ -211,7 +211,6 @@ export function StreetviewClientPage({
               className="w-full h-full"
               style={{ display: globeEnabled ? 'block' : 'none' }}
               center={location?.position}
-              zoom={17}
               heading={location?.heading}
             />
           )}
