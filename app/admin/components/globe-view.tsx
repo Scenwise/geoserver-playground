@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { CSSProperties, useEffect, useRef, useState } from 'react'
 import { Coordinate } from 'ol/coordinate'
 import { coordinateToLatLng } from '@/lib/google-maps'
 
@@ -9,6 +9,16 @@ interface GlobeViewProps {
   zoom?: number
   heading?: number
   className?: string
+  style?: CSSProperties
+}
+
+function waitForGoogleMaps(cb: () => void, retries = 20) {
+  if (window.google?.maps) {
+    cb()
+    return
+  }
+  if (retries <= 0) return
+  setTimeout(() => waitForGoogleMaps(cb, retries - 1), 250)
 }
 
 export function GlobeView({
@@ -16,36 +26,39 @@ export function GlobeView({
   zoom = 17,
   heading = 0,
   className,
+  style,
 }: GlobeViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<google.maps.Map | null>(null)
   const [tilt, setTiltState] = useState(45)
 
   useEffect(() => {
-    if (!containerRef.current || !window.google?.maps) return
+    if (!containerRef.current) return
 
-    const latLng = center
-      ? coordinateToLatLng(center)
-      : new google.maps.LatLng(52.3676, 4.9041)
+    waitForGoogleMaps(() => {
+      if (!containerRef.current) return
 
-    // Use WebGL-powered map for free tilt at any location
-    const gmap = new google.maps.Map(containerRef.current, {
-      center: latLng,
-      zoom,
-      tilt: 45,
-      heading,
-      mapTypeId: 'satellite',
-      mapId: 'DEMO_MAP_ID', // required for WebGL/3D features
-      disableDefaultUI: true,
-      rotateControl: true,
-      zoomControl: true,
-      gestureHandling: 'greedy',
-    })
+      const latLng = center
+        ? coordinateToLatLng(center)
+        : new google.maps.LatLng(52.3676, 4.9041)
 
-    mapRef.current = gmap
+      const gmap = new google.maps.Map(containerRef.current, {
+        center: latLng,
+        zoom,
+        tilt: 45,
+        heading,
+        mapTypeId: 'satellite',
+        disableDefaultUI: true,
+        rotateControl: true,
+        zoomControl: true,
+        gestureHandling: 'greedy',
+      })
 
-    gmap.addListener('tilt_changed', () => {
-      setTiltState(gmap.getTilt() ?? 45)
+      mapRef.current = gmap
+
+      gmap.addListener('tilt_changed', () => {
+        setTiltState(gmap.getTilt() ?? 45)
+      })
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -67,7 +80,7 @@ export function GlobeView({
   }
 
   return (
-    <div className={className} style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div className={className} style={{ width: '100%', height: '100%', position: 'relative', ...style }}>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 
       <div style={{
