@@ -4,6 +4,8 @@ import { CSSProperties, useEffect, useRef, useState } from 'react'
 import { Coordinate } from 'ol/coordinate'
 import { coordinateToLatLng } from '@/lib/google-maps'
 
+const MAX_TILT = 67.5
+
 interface GlobeViewProps {
   center?: Coordinate
   zoom?: number
@@ -58,10 +60,10 @@ export function GlobeView({
       })
 
       mapRef.current = gmap
-      console.log('[GlobeView] map created, mapId=DEMO_MAP_ID, initial tilt=0')
+      console.log('[GlobeView] map created')
 
       gmap.addListener('tilesloaded', () => {
-        console.log('[GlobeView] tilesloaded, current tilt:', gmap.getTilt())
+        console.log('[GlobeView] tilesloaded, tilt:', gmap.getTilt())
       })
 
       gmap.addListener('tilt_changed', () => {
@@ -75,20 +77,20 @@ export function GlobeView({
 
   useEffect(() => {
     if (!mapRef.current || !center) return
-    mapRef.current.setCenter(coordinateToLatLng(center))
+    mapRef.current.moveCamera({ center: coordinateToLatLng(center) })
   }, [center])
 
   useEffect(() => {
     if (!mapRef.current) return
-    mapRef.current.setHeading(heading)
+    mapRef.current.moveCamera({ heading })
   }, [heading])
 
   function applyTilt(value: number) {
-    const clamped = Math.max(0, Math.min(45, value))
+    const clamped = Math.max(0, Math.min(MAX_TILT, value))
     console.log('[GlobeView] applyTilt ->', clamped)
     setTiltState(clamped)
-    mapRef.current?.setTilt(clamped)
-    console.log('[GlobeView] getTilt() after setTilt:', mapRef.current?.getTilt())
+    mapRef.current?.moveCamera({ tilt: clamped })
+    console.log('[GlobeView] getTilt() after moveCamera:', mapRef.current?.getTilt())
   }
 
   return (
@@ -102,7 +104,7 @@ export function GlobeView({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '6px',
+        gap: '4px',
         zIndex: 10,
         background: 'white',
         border: '1px solid #ccc',
@@ -116,22 +118,23 @@ export function GlobeView({
         <span style={{ fontSize: '11px', color: '#333', fontWeight: 600 }}>
           {Math.round(tilt)}°
         </span>
-        <input
-          type="range"
-          min={0}
-          max={45}
-          step={1}
-          value={tilt}
-          onChange={(e) => applyTilt(Number(e.target.value))}
-          style={{
-            writingMode: 'vertical-lr',
-            direction: 'rtl',
-            width: '24px',
-            height: '100px',
-            cursor: 'pointer',
-            accentColor: '#1a73e8',
-          }}
-        />
+        <span style={{ fontSize: '10px', color: '#aaa' }}>{MAX_TILT}°</span>
+        <div style={{ height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <input
+            type="range"
+            min={0}
+            max={MAX_TILT}
+            step={0.5}
+            value={tilt}
+            onChange={(e) => applyTilt(Number(e.target.value))}
+            style={{
+              width: '100px',
+              cursor: 'pointer',
+              accentColor: '#1a73e8',
+              transform: 'rotate(-90deg)',
+            }}
+          />
+        </div>
         <span style={{ fontSize: '10px', color: '#aaa' }}>0°</span>
       </div>
     </div>
