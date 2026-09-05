@@ -9,8 +9,6 @@ export async function GET(
   try {
     res = await fetch(
       `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${id}&outputFormat=application/json`,
-      // GeoServer closes HTTP/2 streams uncleanly; force HTTP/1.1 to avoid ERR_HTTP2_PROTOCOL_ERROR
-      { headers: { Connection: 'close' } },
     )
   } catch (err) {
     console.error(`GeoServer fetch failed for layer "${id}":`, err)
@@ -26,6 +24,9 @@ export async function GET(
     )
   }
 
-  const data = await res.json()
-  return Response.json(data)
+  // Stream the response body directly instead of buffering + re-serialising,
+  // so a truncated HTTP/2 stream doesn't cause a JSON parse crash server-side.
+  return new Response(res.body, {
+    headers: { 'Content-Type': 'application/json' },
+  })
 }
