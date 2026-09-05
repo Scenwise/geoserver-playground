@@ -11,7 +11,7 @@ export async function GET(
       `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${id}&outputFormat=application/json`,
     )
   } catch (err) {
-    console.error(`GeoServer fetch failed for layer "${id}":`, err)
+    console.error(`.GeoServer fetch failed for layer "${id}":`, err)
     return Response.json({ error: 'Failed to reach GeoServer' }, { status: 502 })
   }
 
