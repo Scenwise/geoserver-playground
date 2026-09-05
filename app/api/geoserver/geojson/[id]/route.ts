@@ -35,28 +35,41 @@ async function fetchPage(id: string, startIndex: number): Promise<unknown[]> {
   return []
 }
 
+async function getTotalCount(id: string): Promise<number> {
+  const url = `${BASE}?service=WFS&version=2.0.0&request=GetFeature&typeName=${id}&outputFormat=application/json&count=1&startIndex=0`
+  const res = await fetch(url)
+  const data: { numberMatched?: number; totalFeatures?: number } = await res.json()
+  return data.numberMatched ?? data.totalFeatures ?? 0
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const allFeatures: unknown[] = []
-  let startIndex = 0
 
-  while (true) {
-    let features: unknown[]
-    try {
-      features = await fetchPage(id, startIndex)
-    } catch (err) {
-      console.error(`GeoServer fetch failed for layer "${id}" at startIndex ${startIndex}:`, err)
-      return Response.json({ error: 'Failed to fetch from GeoServer', detail: String(err) }, { status: 502 })
-    }
-
-    allFeatures.push(...features)
-    if (features.length < PAGE_SIZE) break
-    startIndex += PAGE_SIZE
+  let total: number
+  try {
+    total = await getTotalCount(id)
+  } catch (err) {
+    console.error(`Failed to get feature count for "${id}":`, err)
+    return Response.json({ error: 'Failed to reach GeoServer' }, { status: 502 })
   }
 
+  const offsets = Array.from(
+    { length: Math.ceil(total / PAGE_SIZE) },
+    (_, i) => i * PAGE_SIZE,
+  )
+
+  let pages: unknown[][]
+  try {
+    pages = await Promise.all(offsets.map((startIndex) => fetchPage(id, startIndex)))
+  } catch (err) {
+    console.error(`GeoServer fetch failed for layer "${id}":`, err)
+    return Response.json({ error: 'Failed to fetch from GeoServer', detail: String(err) }, { status: 502 })
+  }
+
+  const allFeatures = pages.flat()
   return Response.json({ type: 'FeatureCollection', features: allFeatures })
 }
 
