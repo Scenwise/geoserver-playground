@@ -9,9 +9,11 @@ export async function GET(
   try {
     res = await fetch(
       `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${id}&outputFormat=application/json`,
+      // GeoServer closes HTTP/2 streams uncleanly; force HTTP/1.1 to avoid ERR_HTTP2_PROTOCOL_ERROR
+      { headers: { Connection: 'close' } },
     )
   } catch (err) {
-    console.error(`.GeoServer fetch failed for layer "${id}":`, err)
+    console.error(`GeoServer fetch failed for layer "${id}":`, err)
     return Response.json({ error: 'Failed to reach GeoServer' }, { status: 502 })
   }
 
