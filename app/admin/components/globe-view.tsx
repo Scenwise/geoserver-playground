@@ -182,9 +182,7 @@ export function GlobeView({
       for (let i = 0; i < layers.length; i++) {
         const layer = layers[i]
         try {
-          const res = await fetch(
-            `https://geoserver.scenwise.nl/geoserver/scenwise/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${layer.layerId}&outputFormat=application/json`,
-          )
+          const res = await fetch(`/api/geoserver/geojson/${layer.layerId}`)
           if (!res.ok || cancelled) continue
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const geojson: { features: { geometry: any }[] } = await res.json()
